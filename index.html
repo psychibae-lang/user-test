@@ -65,13 +65,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .prog{height:3px;background:#f0f0f0;border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:#2563eb;transition:width 0.3s}
 .q-body{padding:1.25rem}
-.inst{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:13px 15px;margin-bottom:1.25rem;font-size:15px;font-weight:500;color:#1d4ed8;line-height:1.7;position:sticky;top:68px;z-index:5}
-.q-num{font-size:14px;color:#888;margin-bottom:6px;font-weight:500}
-.q-txt{font-size:18px;font-weight:600;line-height:1.7;margin-bottom:16px;color:#111}
+.inst{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px 16px;margin-bottom:1.25rem;font-size:17px;font-weight:600;color:#1d4ed8;line-height:1.75;position:sticky;top:68px;z-index:5}
+.q-num{font-size:15px;color:#666;margin-bottom:8px;font-weight:600}
+.q-txt{font-size:22px;font-weight:700;line-height:1.7;margin-bottom:18px;color:#111}
 .opts{display:flex;flex-direction:column;gap:6px}
-.opt{display:flex;align-items:center;gap:10px;padding:13px 15px;border:1px solid #e8e8e8;border-radius:9px;cursor:pointer;font-size:16px;transition:all 0.12s;color:#111}
+.opt{display:flex;align-items:center;gap:10px;padding:15px 16px;border:1px solid #e8e8e8;border-radius:10px;cursor:pointer;font-size:19px;transition:all 0.12s;color:#111;font-weight:500}
 .opt:hover{border-color:#bbb;background:#fafafa}.opt.sel{border:1.5px solid #2563eb;background:#eff6ff;color:#1d4ed8;font-weight:500}
-.dot{width:20px;height:20px;border-radius:50%;border:2px solid #ddd;flex-shrink:0;background:#fff}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid #ddd;flex-shrink:0;background:#fff}
 .opt.sel .dot{background:#2563eb;border-color:#2563eb}
 .nav{display:flex;gap:8px;margin-top:1.25rem}
 .btn{padding:10px 18px;border:1px solid #ddd;border-radius:9px;background:#fff;cursor:pointer;font-size:13px;font-weight:500;color:#1a1a1a}
@@ -506,6 +506,7 @@ function renderQ(){
   const isLast=q===total-1&&st.scaleIdx===st.scaleIds.length-1;
   const isScaleLast=q===total-1;
   document.getElementById('q-body').innerHTML=`
+    <style id="q-font-style"></style>
     <div class="inst">${sc.inst}</div>
     <div class="q-num">문항 ${q+1} / ${total}</div>
     <div class="q-txt">${sc.qs[q]}</div>
@@ -526,26 +527,33 @@ function renderQ(){
 }
 
 
-// 글자 크기 조정
-const fontSizes=[14,16,18,20,22];
+// 글자 크기 조정 (기본 크기 기준 배율)
+const fontScales=[0.85,1.0,1.2,1.4,1.6];
 const fontLabels=['작게','보통','크게','더크게','최대'];
-let fontIdx=1; // 기본: 보통(16px)
+let fontIdx=1;
+let baseFontSizes={q:22,opt:19,inst:17,num:15};
 
 function changeFontSize(dir){
-  fontIdx=Math.max(0,Math.min(fontSizes.length-1,fontIdx+dir));
+  fontIdx=Math.max(0,Math.min(fontScales.length-1,fontIdx+dir));
   applyFontSize();
 }
 function applyFontSize(){
-  // q-body의 글자 크기만 조정
-  const qb=document.getElementById('q-body');
-  if(qb){
-    qb.style.fontSize=fontSizes[fontIdx]+'px';
-  }
+  const scale=fontScales[fontIdx];
+  const style=document.getElementById('q-font-style');
+  const css=`
+    .q-txt{font-size:${Math.round(baseFontSizes.q*scale)}px !important}
+    .opt{font-size:${Math.round(baseFontSizes.opt*scale)}px !important; padding:${Math.round(13*scale)}px 16px !important}
+    .inst{font-size:${Math.round(baseFontSizes.inst*scale)}px !important}
+    .q-num{font-size:${Math.round(baseFontSizes.num*scale)}px !important}
+    .dot{width:${Math.round(22*scale)}px !important; height:${Math.round(22*scale)}px !important}
+    .btn{font-size:${Math.round(14*scale)}px !important; padding:${Math.round(10*scale)}px 18px !important}
+  `;
+  if(style){style.textContent=css;}
   const lbl=document.getElementById('font-size-label');
   if(lbl)lbl.textContent=fontLabels[fontIdx];
-  // 다음 문항 렌더링 시 유지
-  document.documentElement.style.setProperty('--q-font',fontSizes[fontIdx]+'px');
 }
+
+function _afterRenderQ(){applyFontSize();}
 
 function selAns(val){
   const sid=st.scaleIds[st.scaleIdx];
