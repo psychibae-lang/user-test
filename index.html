@@ -391,9 +391,8 @@ async function issue(type){
   if(selScales.size===0){toast('검사지를 1개 이상 선택하세요.');return;}
   const name=document.getElementById('pt-name').value.trim();
   if(!name){toast('환자 이름 또는 번호를 입력하세요.');return;}
-  const title='';
-  const sid='s-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
-  const{error}=await sb.from('sessions').insert({id:sid,patient_name:name,title:title||'',scales:[...selScales],status:'대기중'});
+const sid='s-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+  const{error}=await sb.from('sessions').insert({id:sid,patient_name:name,scales:[...selScales],status:'대기중'});
   if(error){toast('오류: '+error.message);return;}
   const base=location.href.split('#')[0];
   const url=base+'#s-'+sid;
