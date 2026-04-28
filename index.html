@@ -78,16 +78,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn:hover{background:#f5f5f3}.btn.pri{background:#1a1a1a;color:#fff;border-color:#1a1a1a}.btn.sm{padding:4px 10px;font-size:11px}
 .btn:disabled{opacity:0.4;cursor:not-allowed}
 .res-hdr{padding:1.25rem;border-bottom:1px solid #ebebeb}
-.res-hdr h1{font-size:17px;font-weight:600}.res-hdr p{font-size:12px;color:#888;margin-top:3px}
+.res-hdr h1{font-size:24px;font-weight:700}.res-hdr p{font-size:16px;color:#666;margin-top:6px}
 .res-body{padding:1.25rem}
-.res-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.res-card{background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:20px 22px;margin-bottom:14px}
 .res-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
-.res-nm{font-size:13px;font-weight:600}.res-score{font-size:20px;font-weight:700;text-align:right}
-.sev{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
+.res-nm{font-size:20px;font-weight:700}.res-score{font-size:36px;font-weight:800;text-align:right;color:#1d4ed8}
+.sev{display:inline-block;font-size:16px;padding:6px 14px;border-radius:12px;font-weight:700}
 .sev-n{background:#d1fae5;color:#065f46}.sev-m{background:#fef3c7;color:#92400e}
 .sev-mo{background:#ffedd5;color:#9a3412}.sev-s{background:#fee2e2;color:#991b1b}
 .done-box{text-align:center;padding:3rem 1rem}
-.done-box h2{font-size:20px;font-weight:600;margin-bottom:8px}.done-box p{font-size:13px;color:#888;line-height:1.7}
+.done-box h2{font-size:28px;font-weight:700;margin-bottom:12px}.done-box p{font-size:18px;color:#666;line-height:1.8}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;z-index:200;opacity:0;transition:opacity 0.2s;pointer-events:none}
 .toast.show{opacity:1}
 .empty{text-align:center;padding:2rem;color:#aaa;font-size:13px}
@@ -170,7 +170,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <div class="screen" id="s-done">
   <div class="done-box">
-    <div style="font-size:48px;margin-bottom:1rem">✅</div>
+    <div style="font-size:72px;margin-bottom:1.5rem">✅</div>
     <h2>검사가 완료되었습니다</h2>
     <p>답변해 주셔서 감사합니다.<br>결과는 담당 의사 또는 치료사에게 전달됩니다.<br><br>검사 결과만으로 진단이 이루어지지 않으며,<br>반드시 전문가 상담이 필요합니다.</p>
   </div>
@@ -624,8 +624,8 @@ function showResultScreen(results){
       <div class="res-top">
         <div><div class="res-nm">${m.name} <span class="sc-tag ${TAG_CLS[m.cat]||'tag-other'}">${m.tag}</span></div>
         <div style="font-size:11px;color:#aaa;margin-top:2px">[${m.title}]</div></div>
-        <div><div class="res-score">${r.display||r.s1}</div>
-        <div style="text-align:right;margin-top:2px"><span class="sev ${cls}">${r.interp}</span></div></div>
+        <div style="text-align:right"><div class="res-score">${r.display||r.s1}</div>
+        <div style="text-align:right;margin-top:6px"><span class="sev ${cls}">${r.interp}</span></div></div>
       </div>
     </div>`;
   }).join('')+`<p style="font-size:12px;color:#aaa;line-height:1.7;margin-top:1rem">이 결과는 담당 의사 또는 치료사에게 전달됩니다. 검사 결과만으로 진단이 이루어지지 않으며, 반드시 전문가 상담이 필요합니다.</p>`;
