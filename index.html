@@ -12,7 +12,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .app{max-width:720px;margin:0 auto;background:#fff;min-height:100vh;box-shadow:0 0 0 1px rgba(0,0,0,0.07)}
 .screen{display:none}.screen.active{display:block}
 .hdr{background:#22c55e;color:#fff;text-align:center;padding:14px;font-size:16px;font-weight:700}
-.sub-hdr{background:#a3e635;color:#fff;display:grid;grid-template-columns:1fr 1fr;text-align:center;font-size:13px;font-weight:600}
+.sub-hdr{background:#a3e635;color:#fff;display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;font-size:13px;font-weight:600}
 .sub-hdr span{padding:9px;cursor:pointer}.sub-hdr span.act{background:#16a34a}
 .tab-content{display:none}.tab-content.act{display:block}
 .cat-section{padding:1rem 1.25rem}
@@ -78,21 +78,493 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn:hover{background:#f5f5f3}.btn.pri{background:#1a1a1a;color:#fff;border-color:#1a1a1a}.btn.sm{padding:4px 10px;font-size:11px}
 .btn:disabled{opacity:0.4;cursor:not-allowed}
 .res-hdr{padding:1.25rem;border-bottom:1px solid #ebebeb}
-.res-hdr h1{font-size:24px;font-weight:700}.res-hdr p{font-size:16px;color:#666;margin-top:6px}
+.res-hdr h1{font-size:17px;font-weight:600}.res-hdr p{font-size:12px;color:#888;margin-top:3px}
 .res-body{padding:1.25rem}
-.res-card{background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:20px 22px;margin-bottom:14px}
+.res-card{background:#fff;border:1px solid #e8e8e8;border-radius:10px;padding:12px 14px;margin-bottom:8px}
 .res-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
-.res-nm{font-size:20px;font-weight:700}.res-score{font-size:36px;font-weight:800;text-align:right;color:#1d4ed8}
-.sev{display:inline-block;font-size:16px;padding:6px 14px;border-radius:12px;font-weight:700}
+.res-nm{font-size:13px;font-weight:600}.res-score{font-size:20px;font-weight:700;text-align:right}
+.sev{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
 .sev-n{background:#d1fae5;color:#065f46}.sev-m{background:#fef3c7;color:#92400e}
 .sev-mo{background:#ffedd5;color:#9a3412}.sev-s{background:#fee2e2;color:#991b1b}
 .done-box{text-align:center;padding:3rem 1rem}
-.done-box h2{font-size:28px;font-weight:700;margin-bottom:12px}.done-box p{font-size:18px;color:#666;line-height:1.8}
+.done-box h2{font-size:20px;font-weight:600;margin-bottom:8px}.done-box p{font-size:13px;color:#888;line-height:1.7}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;z-index:200;opacity:0;transition:opacity 0.2s;pointer-events:none}
 .toast.show{opacity:1}
 .empty{text-align:center;padding:2rem;color:#aaa;font-size:13px}
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid #e8e8e8;border-top-color:#1a1a1a;border-radius:50%;animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* === 임상가 척도 CSS === */
+
+  /* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap'); */
+
+  :root {
+    --bg: #f0f2f7;
+    --surface: #ffffff;
+    --surface2: #f5f6fa;
+    --border: #d0d6e8;
+    --accent: #2563eb;
+    --accent2: #7c6af5;
+    --success: #16a34a;
+    --warn: #d97706;
+    --danger: #dc2626;
+    --text: #1a1f36;
+    --text2: #4a5278;
+    --text3: #8a94b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── Header ─── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .header-sub { color: var(--text3); font-size: 12px; }
+  .header-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+
+  /* ─── Patient bar ─── */
+  .patient-bar {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 7px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .patient-bar label { font-size: 11px; color: var(--text2); margin-right: 4px; }
+  .patient-bar input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+    width: 120px;
+  }
+  .patient-bar input:focus { outline: none; border-color: var(--accent); }
+
+  /* ─── Layout ─── */
+  .layout {
+    display: flex;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  .sidebar-title {
+    padding: 0 16px 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text3);
+    font-weight: 500;
+  }
+  .nav-item {
+    padding: 7px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active {
+    background: rgba(79,142,247,0.1);
+    color: var(--accent);
+    border-left-color: var(--accent);
+    font-weight: 500;
+  }
+  .nav-badge {
+    margin-left: auto;
+    font-size: 10px;
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 10px;
+    color: var(--text3);
+  }
+  .nav-item.done .nav-badge { background: rgba(62,201,126,0.15); color: var(--success); }
+
+  /* ─── Main ─── */
+  .main {
+    flex: 1;
+    padding: 16px 20px;
+    max-width: 860px;
+  }
+
+  /* ─── Scale panel ─── */
+  .scale-panel { display: none; }
+  .scale-panel.active { display: block; }
+
+  .scale-header {
+    margin-bottom: 12px;
+  }
+  .scale-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .scale-meta { font-size: 11px; color: var(--text3); }
+
+  /* ─── Items ─── */
+  .item-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .item-card:hover { border-color: #3a4570; }
+  .item-card.scored { border-color: rgba(79,142,247,0.4); }
+
+  .item-header {
+    padding: 8px 14px 5px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .item-num {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: var(--surface2);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px;
+    font-size: 10px;
+    color: var(--text3);
+    margin-right: 6px;
+  }
+  .item-card.scored .item-num { background: rgba(79,142,247,0.2); color: var(--accent); }
+
+  /* ─── Option buttons ─── */
+  .options {
+    padding: 2px 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .opt-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 11.5px;
+    font-family: inherit;
+    line-height: 1.4;
+    transition: all 0.15s;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .opt-btn:hover { background: var(--surface2); border-color: #3a4570; color: var(--text); }
+  .opt-btn.selected {
+    background: rgba(79,142,247,0.12);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .opt-score {
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .opt-btn.selected .opt-score { background: var(--accent); color: #fff; }
+
+  /* ─── BPRS wide options ─── */
+  .options-row {
+    padding: 2px 12px 8px;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .opt-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 5px 10px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .opt-chip:hover { border-color: #3a4570; color: var(--text); }
+  .opt-chip.selected {
+    background: rgba(79,142,247,0.18);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ─── Text input items (PSQI, WHODAS days) ─── */
+  .item-input {
+    padding: 4px 18px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .num-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-family: inherit;
+    width: 100px;
+    text-align: center;
+  }
+  .num-input:focus { outline: none; border-color: var(--accent); }
+
+  /* ─── Score footer ─── */
+  .score-footer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .score-big {
+    font-size: 32px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .score-interp {
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .score-interp strong { color: var(--text); font-size: 14px; }
+  .score-actions { margin-left: auto; display: flex; gap: 8px; }
+
+  /* ─── Buttons ─── */
+  .btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #3a7de8; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-success {
+    background: rgba(62,201,126,0.15);
+    border: 1px solid rgba(62,201,126,0.3);
+    color: var(--success);
+  }
+  .btn-success:hover { background: rgba(62,201,126,0.25); }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 13px;
+    color: var(--text);
+    display: none;
+    z-index: 999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    max-width: 340px;
+  }
+  .toast.show { display: block; animation: slideUp 0.3s ease; }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* ─── GDS radio ─── */
+  .gds-options { padding: 2px 12px 10px; display: flex; flex-direction: column; gap: 5px; }
+  .gds-opt {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 12px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 11.5px;
+    font-family: inherit;
+    color: var(--text2);
+    line-height: 1.5;
+    transition: all 0.15s;
+  }
+  .gds-opt:hover { background: var(--surface2); color: var(--text); }
+  .gds-opt.selected { background: rgba(79,142,247,0.1); border-color: var(--accent); color: var(--text); }
+  .gds-stage { font-weight: 600; color: var(--accent); display: block; margin-bottom: 2px; }
+
+  /* ─── BPRS sub-score table ─── */
+  .sub-scores {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .sub-item { display: flex; justify-content: space-between; color: var(--text2); }
+  .sub-val { font-weight: 600; color: var(--text); }
+
+  /* ─── PSQI Component display ─── */
+  .psqi-comps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 12px;
+  }
+  .psqi-comp { background: var(--surface2); border-radius: 7px; padding: 10px 14px; }
+  .psqi-comp-name { color: var(--text3); margin-bottom: 3px; }
+  .psqi-comp-val { font-size: 18px; font-weight: 700; color: var(--accent); }
+
+  /* scroll smooth */
+  html { scroll-behavior: smooth; }
+
+  @media print {
+    @page { size: A4 portrait; margin: 10mm 12mm; }
+
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    html, body { background: #fff !important; }
+
+    .sidebar, header, .patient-bar, .score-actions, .toast { display: none !important; }
+    .print-info { display: flex !important; justify-content: space-between; font-size: 11px; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 8px; }
+
+    .layout { display: block !important; }
+
+    .main {
+      padding: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+
+    .scale-panel { display: none !important; }
+    .scale-panel.active { display: block !important; }
+
+    .scale-header { margin-bottom: 6px !important; }
+    .scale-title { font-size: 14px !important; margin-bottom: 2px !important; }
+    .scale-meta { font-size: 10px !important; }
+
+    .item-card {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      margin-bottom: 4px !important;
+      border-radius: 5px !important;
+      border: 1px solid #c8cfe0 !important;
+    }
+
+    .item-header {
+      padding: 5px 10px 3px !important;
+      font-size: 10px !important;
+      font-weight: 600 !important;
+    }
+
+    .item-num {
+      width: 16px !important; height: 16px !important;
+      line-height: 16px !important; font-size: 9px !important;
+    }
+
+    .options { padding: 2px 10px 6px !important; gap: 3px !important; }
+    .opt-btn {
+      padding: 3px 8px !important;
+      font-size: 9px !important;
+      border-radius: 4px !important;
+      gap: 5px !important;
+    }
+    .opt-score { min-width: 14px !important; height: 14px !important; font-size: 8px !important; }
+
+    .options-row { padding: 2px 10px 6px !important; gap: 3px !important; }
+    .opt-chip { padding: 3px 8px !important; font-size: 9px !important; border-radius: 12px !important; }
+
+    .item-input { padding: 2px 10px 6px !important; }
+    .num-input { padding: 4px 8px !important; font-size: 11px !important; width: 80px !important; }
+
+    .score-footer { margin-top: 8px !important; padding: 10px 14px !important; border-radius: 7px !important; }
+    .score-big { font-size: 26px !important; }
+    .score-interp strong { font-size: 12px !important; }
+
+    .psqi-comps { gap: 4px !important; margin-top: 6px !important; }
+    .psqi-comp { padding: 5px 8px !important; }
+    .psqi-comp-val { font-size: 13px !important; }
+    .psqi-comp-name { font-size: 9px !important; }
+
+    .sub-scores { padding: 8px 12px !important; gap: 4px !important; font-size: 10px !important; margin-top: 6px !important; }
+
+    .gds-options { padding: 2px 10px 6px !important; gap: 4px !important; }
+    .gds-opt { padding: 5px 10px !important; font-size: 9px !important; line-height: 1.4 !important; }
+    .gds-stage { font-size: 9px !important; }
+  }
+
 </style>
 </head>
 <body>
@@ -103,6 +575,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="sub-hdr">
     <span class="act" onclick="switchSubTab('issue',this)">검사 선택</span>
     <span onclick="switchSubTab('status',this)">완료 현황</span>
+    <span onclick="switchSubTab('clin',this)">임상가 척도</span>
   </div>
   <div class="tab-content act" id="tab-issue">
     <div class="cat-section">
@@ -145,6 +618,68 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div id="status-list-body"><div class="empty"><div class="spinner"></div></div></div>
     </div>
   </div>
+  <div class="tab-content" id="tab-clin">
+    <div id="clin-lock" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;padding:2rem">
+      <div style="font-size:36px">🔐</div>
+      <div style="font-size:18px;font-weight:600">임상가 척도</div>
+      <div style="font-size:13px;color:#888">관리자 비밀번호를 입력하세요</div>
+      <input type="password" id="clin-pw" placeholder="비밀번호" 
+        style="padding:11px 14px;border:1px solid #ddd;border-radius:10px;font-size:15px;outline:none;width:200px;text-align:center;letter-spacing:2px"
+        onkeydown="if(event.key==='Enter')clinLogin()" />
+      <div id="clin-err" style="font-size:12px;color:#ef4444;min-height:16px"></div>
+      <button onclick="clinLogin()" style="padding:11px 28px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">확인</button>
+    </div>
+    <div id="clin-body" style="display:none">
+      <div style="padding:8px 1rem;background:#f9f9f7;border-bottom:1px solid #eee;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div><label style="font-size:12px;color:#888;margin-right:6px">환자번호</label>
+          <input type="text" id="ptNum" placeholder="45678" style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;width:90px"></div>
+        <div><label style="font-size:12px;color:#888;margin-right:6px">검사날짜</label>
+          <input type="text" id="ptDate" placeholder="260428" style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;width:80px"></div>
+        <button onclick="saveClinResult()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">💾 저장</button>
+        <button onclick="document.getElementById('clin-lock').style.display='flex';document.getElementById('clin-body').style.display='none';clinUnlocked=false;" 
+          style="padding:8px 12px;background:#fff;color:#888;border:1px solid #ddd;border-radius:8px;font-size:12px;cursor:pointer">잠금</button>
+      </div>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-title">검사 목록</div>
+    <div class="nav-item active" onclick="showPanel('hamd')">
+      <span>HAMD</span><span class="nav-badge" id="badge-hamd">17</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('hama')">
+      <span>HAMA</span><span class="nav-badge" id="badge-hama">14</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('bprs')">
+      <span>BPRS</span><span class="nav-badge" id="badge-bprs">18</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('bdrs')">
+      <span>BDRS</span><span class="nav-badge" id="badge-bdrs">19</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('ymrs')">
+      <span>YMRS</span><span class="nav-badge" id="badge-ymrs">11</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('whodas')">
+      <span>WHODAS</span><span class="nav-badge" id="badge-whodas">15</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('honos')">
+      <span>HoNOS</span><span class="nav-badge" id="badge-honos">13</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('mmse')">
+      <span>MMSE/GDS</span><span class="nav-badge" id="badge-mmse">30</span>
+    </div>
+    <div class="nav-item" onclick="showPanel('psqi')">
+      <span>PSQI</span><span class="nav-badge" id="badge-psqi">—</span>
+    </div>
+  </nav>
+
+  <main class="main" id="mainContent">
+    <div class="print-info" id="printInfoBar" style="display:none">
+      <span id="printInfoLeft"></span>
+      <span id="printInfoRight"></span>
+    </div>
+  </main>
+</div>
+    </div>
+  </div>
 </div>
 
 <div class="screen" id="s-q">
@@ -170,7 +705,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <div class="screen" id="s-done">
   <div class="done-box">
-    <div style="font-size:72px;margin-bottom:1.5rem">✅</div>
+    <div style="font-size:48px;margin-bottom:1rem">✅</div>
     <h2>검사가 완료되었습니다</h2>
     <p>답변해 주셔서 감사합니다.<br>결과는 담당 의사 또는 치료사에게 전달됩니다.<br><br>검사 결과만으로 진단이 이루어지지 않으며,<br>반드시 전문가 상담이 필요합니다.</p>
   </div>
@@ -352,6 +887,7 @@ function switchSubTab(tab,el){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('act'));
   document.getElementById('tab-'+tab).classList.add('act');
   if(tab==='status')loadStatus();
+  if(tab==='clin'){if(clinUnlocked){document.getElementById('clin-lock').style.display='none';document.getElementById('clin-body').style.display='block';}else{setTimeout(()=>document.getElementById('clin-pw')?.focus(),100);}}
 }
 
 function renderCatGrid(){
@@ -506,7 +1042,479 @@ function renderQ(){
   const isLast=q===total-1&&st.scaleIdx===st.scaleIds.length-1;
   const isScaleLast=q===total-1;
   document.getElementById('q-body').innerHTML=`
-    <style id="q-font-style"></style>
+    <style id="q-font-style">
+/* === 임상가 척도 CSS === */
+
+  /* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap'); */
+
+  :root {
+    --bg: #f0f2f7;
+    --surface: #ffffff;
+    --surface2: #f5f6fa;
+    --border: #d0d6e8;
+    --accent: #2563eb;
+    --accent2: #7c6af5;
+    --success: #16a34a;
+    --warn: #d97706;
+    --danger: #dc2626;
+    --text: #1a1f36;
+    --text2: #4a5278;
+    --text3: #8a94b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── Header ─── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .header-sub { color: var(--text3); font-size: 12px; }
+  .header-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+
+  /* ─── Patient bar ─── */
+  .patient-bar {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 7px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .patient-bar label { font-size: 11px; color: var(--text2); margin-right: 4px; }
+  .patient-bar input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+    width: 120px;
+  }
+  .patient-bar input:focus { outline: none; border-color: var(--accent); }
+
+  /* ─── Layout ─── */
+  .layout {
+    display: flex;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  .sidebar-title {
+    padding: 0 16px 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text3);
+    font-weight: 500;
+  }
+  .nav-item {
+    padding: 7px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active {
+    background: rgba(79,142,247,0.1);
+    color: var(--accent);
+    border-left-color: var(--accent);
+    font-weight: 500;
+  }
+  .nav-badge {
+    margin-left: auto;
+    font-size: 10px;
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 10px;
+    color: var(--text3);
+  }
+  .nav-item.done .nav-badge { background: rgba(62,201,126,0.15); color: var(--success); }
+
+  /* ─── Main ─── */
+  .main {
+    flex: 1;
+    padding: 16px 20px;
+    max-width: 860px;
+  }
+
+  /* ─── Scale panel ─── */
+  .scale-panel { display: none; }
+  .scale-panel.active { display: block; }
+
+  .scale-header {
+    margin-bottom: 12px;
+  }
+  .scale-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .scale-meta { font-size: 11px; color: var(--text3); }
+
+  /* ─── Items ─── */
+  .item-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .item-card:hover { border-color: #3a4570; }
+  .item-card.scored { border-color: rgba(79,142,247,0.4); }
+
+  .item-header {
+    padding: 8px 14px 5px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .item-num {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: var(--surface2);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px;
+    font-size: 10px;
+    color: var(--text3);
+    margin-right: 6px;
+  }
+  .item-card.scored .item-num { background: rgba(79,142,247,0.2); color: var(--accent); }
+
+  /* ─── Option buttons ─── */
+  .options {
+    padding: 2px 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .opt-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 11.5px;
+    font-family: inherit;
+    line-height: 1.4;
+    transition: all 0.15s;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .opt-btn:hover { background: var(--surface2); border-color: #3a4570; color: var(--text); }
+  .opt-btn.selected {
+    background: rgba(79,142,247,0.12);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .opt-score {
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .opt-btn.selected .opt-score { background: var(--accent); color: #fff; }
+
+  /* ─── BPRS wide options ─── */
+  .options-row {
+    padding: 2px 12px 8px;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .opt-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 5px 10px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .opt-chip:hover { border-color: #3a4570; color: var(--text); }
+  .opt-chip.selected {
+    background: rgba(79,142,247,0.18);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ─── Text input items (PSQI, WHODAS days) ─── */
+  .item-input {
+    padding: 4px 18px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .num-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-family: inherit;
+    width: 100px;
+    text-align: center;
+  }
+  .num-input:focus { outline: none; border-color: var(--accent); }
+
+  /* ─── Score footer ─── */
+  .score-footer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .score-big {
+    font-size: 32px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .score-interp {
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .score-interp strong { color: var(--text); font-size: 14px; }
+  .score-actions { margin-left: auto; display: flex; gap: 8px; }
+
+  /* ─── Buttons ─── */
+  .btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #3a7de8; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-success {
+    background: rgba(62,201,126,0.15);
+    border: 1px solid rgba(62,201,126,0.3);
+    color: var(--success);
+  }
+  .btn-success:hover { background: rgba(62,201,126,0.25); }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 13px;
+    color: var(--text);
+    display: none;
+    z-index: 999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    max-width: 340px;
+  }
+  .toast.show { display: block; animation: slideUp 0.3s ease; }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* ─── GDS radio ─── */
+  .gds-options { padding: 2px 12px 10px; display: flex; flex-direction: column; gap: 5px; }
+  .gds-opt {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 12px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 11.5px;
+    font-family: inherit;
+    color: var(--text2);
+    line-height: 1.5;
+    transition: all 0.15s;
+  }
+  .gds-opt:hover { background: var(--surface2); color: var(--text); }
+  .gds-opt.selected { background: rgba(79,142,247,0.1); border-color: var(--accent); color: var(--text); }
+  .gds-stage { font-weight: 600; color: var(--accent); display: block; margin-bottom: 2px; }
+
+  /* ─── BPRS sub-score table ─── */
+  .sub-scores {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .sub-item { display: flex; justify-content: space-between; color: var(--text2); }
+  .sub-val { font-weight: 600; color: var(--text); }
+
+  /* ─── PSQI Component display ─── */
+  .psqi-comps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 12px;
+  }
+  .psqi-comp { background: var(--surface2); border-radius: 7px; padding: 10px 14px; }
+  .psqi-comp-name { color: var(--text3); margin-bottom: 3px; }
+  .psqi-comp-val { font-size: 18px; font-weight: 700; color: var(--accent); }
+
+  /* scroll smooth */
+  html { scroll-behavior: smooth; }
+
+  @media print {
+    @page { size: A4 portrait; margin: 10mm 12mm; }
+
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    html, body { background: #fff !important; }
+
+    .sidebar, header, .patient-bar, .score-actions, .toast { display: none !important; }
+    .print-info { display: flex !important; justify-content: space-between; font-size: 11px; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 8px; }
+
+    .layout { display: block !important; }
+
+    .main {
+      padding: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+
+    .scale-panel { display: none !important; }
+    .scale-panel.active { display: block !important; }
+
+    .scale-header { margin-bottom: 6px !important; }
+    .scale-title { font-size: 14px !important; margin-bottom: 2px !important; }
+    .scale-meta { font-size: 10px !important; }
+
+    .item-card {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      margin-bottom: 4px !important;
+      border-radius: 5px !important;
+      border: 1px solid #c8cfe0 !important;
+    }
+
+    .item-header {
+      padding: 5px 10px 3px !important;
+      font-size: 10px !important;
+      font-weight: 600 !important;
+    }
+
+    .item-num {
+      width: 16px !important; height: 16px !important;
+      line-height: 16px !important; font-size: 9px !important;
+    }
+
+    .options { padding: 2px 10px 6px !important; gap: 3px !important; }
+    .opt-btn {
+      padding: 3px 8px !important;
+      font-size: 9px !important;
+      border-radius: 4px !important;
+      gap: 5px !important;
+    }
+    .opt-score { min-width: 14px !important; height: 14px !important; font-size: 8px !important; }
+
+    .options-row { padding: 2px 10px 6px !important; gap: 3px !important; }
+    .opt-chip { padding: 3px 8px !important; font-size: 9px !important; border-radius: 12px !important; }
+
+    .item-input { padding: 2px 10px 6px !important; }
+    .num-input { padding: 4px 8px !important; font-size: 11px !important; width: 80px !important; }
+
+    .score-footer { margin-top: 8px !important; padding: 10px 14px !important; border-radius: 7px !important; }
+    .score-big { font-size: 26px !important; }
+    .score-interp strong { font-size: 12px !important; }
+
+    .psqi-comps { gap: 4px !important; margin-top: 6px !important; }
+    .psqi-comp { padding: 5px 8px !important; }
+    .psqi-comp-val { font-size: 13px !important; }
+    .psqi-comp-name { font-size: 9px !important; }
+
+    .sub-scores { padding: 8px 12px !important; gap: 4px !important; font-size: 10px !important; margin-top: 6px !important; }
+
+    .gds-options { padding: 2px 10px 6px !important; gap: 4px !important; }
+    .gds-opt { padding: 5px 10px !important; font-size: 9px !important; line-height: 1.4 !important; }
+    .gds-stage { font-size: 9px !important; }
+  }
+
+</style>
     <div class="inst">${sc.inst}</div>
     <div class="q-num">문항 ${q+1} / ${total}</div>
     <div class="q-txt">${sc.qs[q]}</div>
@@ -624,8 +1632,8 @@ function showResultScreen(results){
       <div class="res-top">
         <div><div class="res-nm">${m.name} <span class="sc-tag ${TAG_CLS[m.cat]||'tag-other'}">${m.tag}</span></div>
         <div style="font-size:11px;color:#aaa;margin-top:2px">[${m.title}]</div></div>
-        <div style="text-align:right"><div class="res-score">${r.display||r.s1}</div>
-        <div style="text-align:right;margin-top:6px"><span class="sev ${cls}">${r.interp}</span></div></div>
+        <div><div class="res-score">${r.display||r.s1}</div>
+        <div style="text-align:right;margin-top:2px"><span class="sev ${cls}">${r.interp}</span></div></div>
       </div>
     </div>`;
   }).join('')+`<p style="font-size:12px;color:#aaa;line-height:1.7;margin-top:1rem">이 결과는 담당 의사 또는 치료사에게 전달됩니다. 검사 결과만으로 진단이 이루어지지 않으며, 반드시 전문가 상담이 필요합니다.</p>`;
@@ -646,6 +1654,1052 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 function p2(n){return String(n).padStart(2,'0');}
 
 init();
+
+
+// ═══════════════════════════════════════════════════
+// DATA DEFINITIONS
+// ═══════════════════════════════════════════════════
+
+const CLIN_SCALES = {
+
+hamd: {
+  title: 'HAMD',
+  fullTitle: 'Hamilton Depression Rating Scale',
+  comment: '17항목, 최고점 52, (8 mild, 17 moderate, 24 severe)',
+  interpret: (s) => {
+    if(s<=7) return '정상 (우울증 아님)';
+    if(s<=16) return 'Mild Depression';
+    if(s<=23) return 'Moderate Depression';
+    return 'Severe Depression';
+  },
+  copyFmt: (d, s, i) => `${d}/ HAMD/ ${s}/ ${i}`,
+  pdfFmt: (n, d) => `${n}HAMD${d}`,
+  items: [
+    {q:'1. 우울한 기분', opts:['없음','질문에 의해서만 기분상태가 있다','스스로 기분상태를 말한다','비언어적 방법으로 기분상태를 나타낸다','언어 및 비언어적 방법으로 모두 표현한다']},
+    {q:'2. 죄책감', opts:['없음','자책감, 사람들을 낙담시켰다는 느낌','과거 실수에 대한 죄책감/반추','현재 아픈 것이 응징이라 생각, 죄책망상','비난하는 환청이나 위협적 환시']},
+    {q:'3. 자살사고', opts:['없음','인생이 살 가치 없다는 느낌','이미 죽었어야 한다는 소망/죽을 가능성에 대한 생각','자살사고 혹은 제스처','자살 시도']},
+    {q:'4. 초기 불면증', opts:['잠드는 데 불편 없음','가끔 잠들기 힘듦 (30분 이상)','매일 밤 잠들기 힘들다고 호소']},
+    {q:'5. 중기 불면증', opts:['어려움 없음','밤 동안 잘 못 잤다고 호소','밤 동안 잠에서 깨어남 (용변 제외)']},
+    {q:'6. 말기 불면증', opts:['어려움 없음','아침 일찍 깨나 다시 잠든다','아침에 일찍 깨어 다시 잠들지 못함']},
+    {q:'7. 일과 활동', opts:['어려움 없음','피로감/허약감/자신감 없다는 느낌','일과 취미에 흥미 상실','활동 시간 실제 감소, 생산성 저하','현 증상으로 일을 중단']},
+    {q:'8. 지체 (생각·말·운동활성 저하)', opts:['정상','면담 시 약간 지체','면담 시 뚜렷이 지체','면담이 어려울 정도로 지체','완전한 혼미 상태']},
+    {q:'9. 운동성 초조', opts:['없음','안절부절못함','손이나 머리카락 등을 만지작거림','가만히 앉아있지 못하고 계속 몸 움직임','손 쥐어짜기, 손톱 물어뜯기, 머리카락 당기기 등']},
+    {q:'10. 정신적 불안', opts:['없음','경도','중등도','중증','최고도']},
+    {q:'11. 신체적 불안의 생리적 현상', opts:['없음','경도','중등도','중증','최고도 (기능 불가)']},
+    {q:'12. 위장관계 신체증상', opts:['없음','식욕 없으나 자력으로 식사, 복부 팽만감','보호자 독려 없으면 식사 안 함, 위장관 약 요구']},
+    {q:'13. 전반적인 신체증상', opts:['없음','팔다리·등·머리 무거움, 피로감','확연한 증상 있음']},
+    {q:'14. 성적인 증상', opts:['없음','경도','중등도']},
+    {q:'15. 건강염려증', opts:['없음','몸에 대해 많이 생각','건강에 집착','자주 증상을 호소하거나 진찰 받음','건강염려증적 망상']},
+    {q:'16. 체중감소', opts:['체중감소 없음','현재 증상과 관련하여 체중감소 추측','명백한 체중 감소']},
+    {q:'17. 병식', opts:['자신이 우울하고 병들었음을 인식','병에 걸렸다고 알지만 외부 원인으로 생각','자신의 병을 전적으로 부인']},
+  ]
+},
+
+hama: {
+  title: 'HAMA',
+  fullTitle: 'Hamilton Anxiety Rating Scale',
+  comment: '14항목, 최고점 54, (8 anxiety-mild, 15 anxiety-moderate, 24 anxiety-severe)',
+  interpret: (s) => {
+    if(s<=7) return 'Anxiety-Normal';
+    if(s<=14) return 'Anxiety-Mild';
+    if(s<=23) return 'Anxiety-Moderate';
+    return 'Anxiety-Severe';
+  },
+  copyFmt: (d, s, i) => `${d}/ HAMA/ ${s}/ ${i}`,
+  pdfFmt: (n, d) => `${n}HAMA${d}`,
+  items: [
+    {q:'1. 불안한 기분', opts:['없다','물어보았을 때만 경미한 걱정/불안','사소한 일에 집착, 불안이 그렇지 않은 날보다 많음','거의 매일 일상생활에 지장 줄 불안/걱정','거의 항상 지속적인 불안, 활동 중단']},
+    {q:'2. 긴장', opts:['없다','며칠 동안 경미한 긴장감/가끔 지나치게 깜짝 놀람','하루 절반은 근육 긴장 또는 피로','거의 매일 근육 긴장·피로, 하루 75% 이상 안절부절','면담 시 지속적으로 긴장·초조']},
+    {q:'3. 공포', opts:['없다','경미한 두려움 염려, 심각한 기능문제 없음','1번 이상 두려움으로 고통/회피','거의 매일 두려움 지속, 동반자 필요','두려움/회피로 인한 현저한 기능장해']},
+    {q:'4. 불면', opts:['수면 곤란 없다','경미한 수면 곤란','규칙적인 수면 곤란 (잠드는데 30분 이상)','지속적인 수면 곤란','매일 밤 수면 어렵고 매일 오전 심한 피로']},
+    {q:'5. 인지', opts:['어려움 없다','가끔 건망증/주의집중 어려움 (고통 없음)','반복적으로 건망증/주의집중 어려움','지속적인 주의집중 어려움으로 일상 수행 어려움','주의집중 장해로 일상 역할 수행 장해']},
+    {q:'6. 우울한 기분', opts:['없다','때때로 경미하게 기분 가라앉음','하루 절반 이상 슬픔/흥미 없음','지속적 흥미 상실, 고통스럽거나 타인 관찰 가능','심하게 우울한 기분이 매일, 역할 수행 어려움']},
+    {q:'7. 신체적 증상 (근육계)', opts:['없다','가끔 한두 개 증상, 심각한 고통 없음','여러 증상에 경미한 고통 또는 한 증상에 중등도 고통','증상 없는 날보다 있는 날이 많고 중등도 이상 고통','매일 심각한 고통, 반복적으로 의학적 도움']},
+    {q:'8. 심혈관계 증상', opts:['없다','가끔 한두 개 증상, 심각한 고통 없음','여러 증상에 경미한 고통 또는 한 증상에 중등도 고통','증상 없는 날보다 있는 날이 많고 중등도 이상 고통','매일 심각한 고통, 일상 제한']},
+    {q:'9. 호흡기계 증상', opts:['없다','가끔 한두 개 증상, 심각한 고통 없음','여러 증상에 경미한 고통 또는 한 증상에 중등도 고통','증상 없는 날보다 있는 날이 많고 중등도 이상 고통','매일 심각한 고통, 일상 제한']},
+    {q:'10. 소화기계 증상', opts:['없다','위장 불편감, 변비, 설사, 메스꺼움 가끔','구토, 복부 통증, 설사 여러 번 반복','증상 있는 날이 더 많아 음식/화장실 염려','매일 증상, 심각한 고통, 일상 제한']},
+    {q:'11. 비뇨기계 증상', opts:['없다','비뇨기계 증상 가끔 또는 성적 관심에 경미한 변화','일주일 중 여러 날 나타나고 성기능 때때로 어려움','없는 날보다 있는 날이 많거나 무월경','매일 비뇨생식계 증상, 고통으로 의학적 도움']},
+    {q:'12. 자율신경계 증상', opts:['없다','경미한 증상 가끔','일주일 여러 번 증상, 신경 쓰임','거의 매일 고통/당황스러움','매일 증상, 고통스럽고 기능하기 힘들다']},
+    {q:'13. 면담 시 행동 (전반적)', opts:['뚜렷한 증상 없다','한두 개 증상 경미하게 나타남','경미한 여러 증상 또는 한 증상이 중등도 이상','면담 내내 지속적으로 증상 나타남','초조·과호흡, 면담 끝까지 마치기 힘들다']},
+    {q:'14. 감각계 증상 (이명·흐려보임·달아오름·허약감·찌르는 느낌)', opts:['없다','가끔 한두 개 증상, 심각한 고통 없음','여러 증상에 경미한 고통 또는 한 증상에 중등도 고통','증상 없는 날보다 있는 날이 많고 중등도 이상 고통','매일 심각한 고통, 일상 제한']},
+  ]
+},
+
+bprs: {
+  title: 'BPRS',
+  fullTitle: 'Brief Psychiatric Rating Scale',
+  comment: '18항목, 최고점 108 (사고장애 18/ 적대의심 18/ 철퇴지연 18/ 동요흥분 12/ 불안우울 12)',
+  interpret: (s) => `총점 ${s}`,
+  copyFmt: (d, s, i, scores) => {
+    const th = (scores[3]||0)+(scores[11]||0)+(scores[14]||0);
+    const hs = (scores[9]||0)+(scores[10]||0)+(scores[13]||0);
+    const ws = (scores[2]||0)+(scores[12]||0)+(scores[15]||0);
+    const ds = (scores[5]||0)+(scores[16]||0);
+    const as = (scores[1]||0)+(scores[4]||0)+(scores[8]||0);
+    return `${d}/ BPRS/ 총점-${s} 사고장애-${th} 적대의심-${hs} 철퇴지연-${ws} 동요흥분-${ds} 불안우울-${as}`;
+  },
+  pdfFmt: (n, d) => `${n}BPRS${d}`,
+  items: [
+    {q:'1. 신체적 염려', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'2. 불안', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'3. 감정적 철퇴', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'4. 개념적인 와해', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'5. 죄책감', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'6. 긴장', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'7. 반복적인 행동과 자세', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'8. 과대성', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'9. 우울한 정동', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'10. 적대감', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'11. 의심', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'12. 환각 행동', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'13. 운동지체', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'14. 비협조성', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'15. 이상한 사고내용', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'16. 둔마된 정동', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'17. 흥분성', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+    {q:'18. 지남력 장애', opts:['없음(0)','매우 경함(1)','경함(2)','중등도(3)','중고도(4)','심함(5)','극히 심함(6)']},
+  ]
+},
+
+bdrs: {
+  title: 'BDRS',
+  fullTitle: '양극성 우울증 평가척도 (Bipolar Depression Rating Scale)',
+  comment: '19항목, 최고점 57, (0~7 관해상태, 8~22 환자평균 절단점 이하, 23이상 환자평균 절단점 이상)',
+  interpret: (s) => {
+    if(s<=7) return '관해상태 절단점 이하';
+    if(s<=22) return '환자평균 절단점 이하';
+    return '환자평균 절단점 이상';
+  },
+  copyFmt: (d, s, i) => `${d}/ BDRS/ ${s}/ ${i}`,
+  pdfFmt: (n, d) => `${n}BDRS${d}`,
+  items: [
+    {q:'1. 우울한 기분', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'2. 수면 장해', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'3. 식욕 장해', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'4. 사회적 교류 감소', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'5. 활력 및 활동 감소', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'6. 동기 저하', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'7. 집중력 및 기억력 장해', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'8. 불안', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'9. 무쾌감', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'10. 정동 둔마', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'11. 무가치감', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'12. 무력감과 절망감', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'13. 자살 사고', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'14. 죄책감', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'15. 정신병적 증상', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'16. 자극과민성', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'17. 불안정성', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'18. 운동의욕 항진', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+    {q:'19. 언어활동 항진 / 초조', opts:['없음(0)','경도(1)','중등도(2)','고도(3)']},
+  ]
+},
+
+ymrs: {
+  title: 'YMRS',
+  fullTitle: "Young Mania Rating Scale",
+  comment: '11항목, 최고점 60, (0~12 normal, 13~19 very mild, 20~25 mild, 26~37 moderate, 38이상 severe)',
+  interpret: (s) => {
+    if(s<=12) return 'Normal';
+    if(s<=19) return 'Very Mild';
+    if(s<=25) return 'Mild';
+    if(s<=37) return 'Moderate';
+    return 'Severe';
+  },
+  copyFmt: (d, s, i) => `${d}/ YMRS/ ${s}/ ${i}`,
+  pdfFmt: (n, d) => `${n}YMRS${d}`,
+  items: [
+    {q:'1. 고조된 기분', opts:['없다(0)','물어보았을 때 경도로 고조(1)','주관적으로 명백하게 고조, 낙관적, 유쾌(2)','고조되어 있거나 내용에 부적절, 익살맞다(3)','다행감, 부적절하게 웃음, 노래를 부름(4)']},
+    {q:'2. 운동 활성-에너지 증가', opts:['없다(0)','주관적으로 증가(1)','활기차다, 몸짓 증가(2)','과다한 에너지, 때로 과다활동, 안절부절(진정됨)(3)','운동성 흥분, 지속적 과다활동(진정 안됨)(4)']},
+    {q:'3. 성적 관심', opts:['정상(0)','경도로 증가(1)','물어볼 때 명백하게 주관적 증가(2)','자발적으로 성적 내용을 말함(3)','공공연하게 성적인 행동(4)']},
+    {q:'4. 수면', opts:['감소 없다(0)','정상보다 1시간 미만 감소(1)','정상보다 1시간 이상 감소(2)','수면 필요성 감소 보고(3)','수면 필요성 부인(4)']},
+    {q:'5. 자극과민성', opts:['없다(0)','0~2 사이(1)','주관적으로 증가(2)','2~4 사이(3)','면담 중 때때로 과민, 최근 화를 낸 에피소드(4)','4~6 사이(5)','면담 중 자주 과민, 내내 무뚝뚝하고 퉁명(6)','6~8 사이(7)','적대적, 비협조적, 면담 불가능(8)']},
+    {q:'6. 말-속도와 양', opts:['증가 안 함(0)','0~2 사이(1)','말 많은 듯한 느낌(2)','2~4 사이(3)','때로 속도/양 증가, 때로 장황(4)','4~6 사이(5)','밀어내듯 말함, 속도/양 지속 증가(6)','6~8 사이(7)','쏟아내듯 말함, 중단 불가(8)']},
+    {q:'7. 언어-사고장애', opts:['없다(0)','우원적, 경도 산만, 빠른 사고(1)','산만, 주제 자주 바뀜, 사고 질주(2)','사고 비약/이탈, 따라잡기 힘듦(3)','지리멸렬, 의사소통 불가(4)']},
+    {q:'8. 내용', opts:['정상(0)','0~2 사이(1)','실현 가능성 의심스러운 계획(2)','2~4 사이(3)','특별하고 구체적인 계획, 지나치게 종교적(4)','4~6 사이(5)','면담자를 위협, 고함, 면담 어려움(6)','6~8 사이(7)','폭력적, 파괴적, 면담 불가(8)']},
+    {q:'9. 파탄적-공격적인 행동', opts:['없다, 협조적(0)','0~2 사이(1)','빈정댐, 때로 언성 높임(2)','2~4 사이(3)','요구가 많음, 위협적 행동(4)','4~6 사이(5)','면담자 위협, 고함(6)','6~8 사이(7)','폭력적, 파괴적, 면담 불가(8)']},
+    {q:'10. 용모', opts:['복장과 차림새 적절(0)','약간 흐트러진 듯(1)','단정하지 못함, 중등도로 헝클어짐(2)','옷차림 헝클어짐, 부분적으로만 착용(3)','완전히 흐트러짐, 장식 요란, 괴상함(4)']},
+    {q:'11. 병식', opts:['있다, 치료 필요성 동의(0)','병일 수도 있다(1)','행동 변화 인정하지만 병은 부인(2)','행동 변화 가능성은 인정, 병은 부인(3)','전적으로 행동 변화 부인(4)']},
+  ]
+},
+
+whodas: {
+  title: 'WHODAS',
+  fullTitle: '세계 보건기구 장애조사표 (WHODAS 2.0)',
+  comment: '15항목, 최고점 48, (0~9 기능장애 상위 10% 미만, 10이상 기능장애 상위 10% 이상)',
+  interpret: (s) => {
+    if(s<=9) return '기능장애 상위 10% 미만';
+    return '기능장애 상위 10% 이상';
+  },
+  copyFmt: (d, s, i) => `${d}/ WHODAS/ ${s}/ ${i}`,
+  pdfFmt: (n, d) => `${n}WHODAS${d}`,
+  items: [
+    {q:'1. 30분 동안 서있기와 같이 장시간 서있기', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'2. 집안일 처리하기', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'3. 새로운 과제 배우기', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'4. 지역사회 활동에 참여', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'5. 건강상태가 정서에 미친 영향', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'6. 10분 동안 무엇인가에 집중하기', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'7. 1km와 같은 장거리 걷기', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'8. 몸 전체 씻기', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'9. 옷 입기', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'10. 낯선 사람 대하기', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'11. 친구관계 유지하기', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'12. 일상적인 직장/학교 생활', opts:['없음(0)','약간(1)','보통(2)','심함(3)','극심한 또는 할 수 없음(4)']},
+    {q:'13. 어려움을 겪은 날 (일 수)', type:'number', unit:'일', placeholder:'예) 15'},
+    {q:'14. 평소 활동을 전혀 수행하지 못한 날 (일 수)', type:'number', unit:'일', placeholder:'예) 5'},
+    {q:'15. 일상활동이 감소하거나 줄여야 했던 날 (일 수)', type:'number', unit:'일', placeholder:'예) 10'},
+  ]
+},
+
+honos: {
+  title: 'HoNOS',
+  fullTitle: '건강 성과 척도 (Health of the Nation Outcome Scales)',
+  comment: '13항목, 최고점 52. 0~14 intensive case management 필요없음, 15이상 필요',
+  interpret: (s) => {
+    if(s<=14) return 'Intensive case management 필요없음';
+    return 'Intensive case management 필요';
+  },
+  copyFmt: (d, s, i) => `${d}/ HoNOS/ ${s}/ ${i}`,
+  pdfFmt: (n, d) => `${n}Honos${d}`,
+  items: [
+    {q:'1. 공격적이고 파괴적인 행동', opts:['전혀 없음(0)','조치가 필요치 않은 자극과민성·언쟁(1)','공격적 몸짓·떠밀기·위협·경미한 기물 파손(2)','신체적 공격·보다 심한 기물 파손(3)','심각한 신체적 공격·방화·심각한 협박(4)']},
+    {q:'2. 고의적인 자해', opts:['전혀 없음(0)','일시적 자살 사고, 위험성 거의 없음(1)','가벼운 위험, 손목 긋기 등 위험성 낮은 자해(2)','중등도~심각한 의도적 자해 위험, 준비 행위(3)','심각한 자살 시도(4)']},
+    {q:'3. 알코올 혹은 약물사용 문제', opts:['전혀 없음(0)','사회적 규범 내 다소 과도한 탐닉(1)','음주/약물 조절능력 상실, 심각히 중독은 아님(2)','잦은 조절 상실, 뚜렷한 갈망·의존(3)','알코올/약물 문제로 무능(4)']},
+    {q:'4. 인지 장애', opts:['전혀 없음(0)','기억력·이해력 경미한 문제(0)','경도이나 분명한 인지 문제(2)','시간·장소·사람 지남력 현저한 장애(3)','심각한 지남력 장애, 말 이해 불가(4)']},
+    {q:'5. 신체질환/신체장애 문제', opts:['전혀 없음(0)','경미한 건강 문제(1)','신체 건강 문제로 이동성·활동성에 약간 제약(2)','신체 건강 문제로 활동성 중등도 제약(3)','신체 건강의 심각한 문제(4)']},
+    {q:'6. 환청·망상과 관련된 문제', opts:['전혀 없음(0)','문화 규범 벗어난 약간 이상한 믿음(1)','망상·환각 있으나 고통 없거나 기이한 행동 거의 없음(2)','망상·환각에 현저히 집착, 많은 고통, 기이한 행동(3)','망상·환각으로 심각한 영향(4)']},
+    {q:'7. 우울감과 관련된 문제', opts:['전혀 없음(0)','울적함·경미한 기분 변화(1)','가볍지만 분명한 우울·고통(2)','뚜렷한 신체적·정신적 지연 동반 우울(3)','죄책감·자책감이 있는 심각한 우울(4)']},
+    {q:'8. 다른 정신과적 행동의 문제', opts:['전혀 없음(0)','경미한 비임상적 문제(1)','임상적으로 가벼운 하나의 문제(2)','통제 상실한 간헐적 심한 발작 또는 고통(3)','대부분 활동을 지배하는 심각한 문제(4)']},
+    {q:'9. 대인관계의 문제', opts:['어떤 유의미한 문제도 없음(0)','경미한 비임상적 문제(1)','지지적 관계 맺기·유지에 명백한 문제(2)','사회적 위축·비지지적 관계로 지속적 주요 문제(3)','사회적 의사소통 능력 부재·심각한 수동적 위축(4)']},
+    {q:'10. 일상생활 능력의 문제', opts:['어떤 문제도 없음, 모든 기능 좋음(0)','경미한 문제(1)','자기관리는 적절하나 복잡한 기술 수행에 주요 결함(2)','여러 복잡한 기술 수행 못하고 자기관리 한 영역 이상 주요 문제(3)','거의 모든 복잡한 기술 불능(4)']},
+    {q:'11. 주거 환경의 문제', opts:['주거시설·생활환경 만족스러움(0)','경미·일시적 문제, 전반적으로 수용 가능(1)','주거시설·상황에 하나 이상 중대한 문제(2)','고통 야기하는 다양한 문제의 주거시설(3)','주거시설 수용 불가, 쫓겨나거나 문제 악화(4)']},
+    {q:'12. 직업과 여가 활동의 문제', opts:['주간 환경 만족스러움(0)','경미·일시적 문제(1)','활동 선택 제한됨(2)','이용 가능한 숙련된 서비스 현저 부족(3)','주간 활동에 대한 기회 부족(4)']},
+    {q:'13. 정신증 때문이 아닌 비합리적 강한 믿음', opts:['강한 비합리적 믿음 없음(0)','비합리적 믿음 있으나 인식, 최소한의 삶 영향(1)','비합리적 믿음 있으나 인식, 삶에 경미한 영향(2)','비합리적 믿음, 약간의 병식, 삶에 중대한 부정적 영향(3)','비합리적 믿음에 병식 거의 없음, 심각한 효과(4)']},
+  ]
+},
+
+mmse: {
+  title: 'MMSE & GDS',
+  fullTitle: 'Mini-Mental State Examination & Global Deterioration Scale',
+  comment: 'MMSE(30항목, 최고점 30), GDS(7단계)',
+  isMMSE: true,
+  interpret: (mmse, gds) => `MMSE ${mmse}점, GDS 단계 ${gds}`,
+  copyFmt: (d, mmseScore, gdsStage) => `${d}/ MMSE/ ${mmseScore}/ GDS단계-${gdsStage}`,
+  pdfFmt: (n, d) => `${n}MMSE${d}`,
+  mmseItems: [
+    {cat:'지남력/시간',q:'오늘은 몇 년도입니까?'},
+    {cat:'지남력/시간',q:'몇 월입니까?'},
+    {cat:'지남력/시간',q:'몇 일입니까?'},
+    {cat:'지남력/시간',q:'무슨 요일입니까?'},
+    {cat:'지남력/시간',q:'계절은 무엇입니까?'},
+    {cat:'지남력/주소',q:'도 (시)를 말씀해보세요.'},
+    {cat:'지남력/주소',q:'군 (시, 구)를 말씀해보세요.'},
+    {cat:'지남력/주소',q:'면 (동)을 말씀해보세요.'},
+    {cat:'지남력/주소',q:'리를 말씀해보세요.'},
+    {cat:'지남력/장소',q:'여기는 무엇을 하는 곳인가요?'},
+    {cat:'기억등록',q:'나무'},
+    {cat:'기억등록',q:'자동차'},
+    {cat:'기억등록',q:'모자'},
+    {cat:'주의집중/계산',q:'100-7=?'},
+    {cat:'주의집중/계산',q:'여기서 다시 7 빼기 (93-7)'},
+    {cat:'주의집중/계산',q:'다시 7 빼기 (86-7)'},
+    {cat:'주의집중/계산',q:'또 한번 7 빼기 (79-7)'},
+    {cat:'주의집중/계산',q:'마지막으로 7 빼기 (72-7)'},
+    {cat:'언어기능',q:'시계 이름 맞추기'},
+    {cat:'언어기능',q:'볼펜 이름 맞추기'},
+    {cat:'명령수행',q:'종이를 오른손으로 받아서'},
+    {cat:'명령수행',q:'반으로 접어서'},
+    {cat:'명령수행',q:'무릎 위에 올려 놓으세요'},
+    {cat:'기억회상',q:'나무'},
+    {cat:'기억회상',q:'자동차'},
+    {cat:'기억회상',q:'모자'},
+    {cat:'언어/praxis',q:'오각형 겹쳐서 그리기'},
+    {cat:'언어/praxis',q:'"간장공장공장장" 따라하기'},
+    {cat:'언어/praxis',q:'옷은 왜 빨아 입습니까?'},
+    {cat:'언어/praxis',q:'길에서 주민등록증 주울 때?'},
+  ],
+  gdsStages: [
+    {n:1, label:'인지장애 없음', desc:'임상적으로 정상. 주관적 기억 장애 없음.'},
+    {n:2, label:'매우 경미한 인지장애', desc:'물건을 둔 곳을 잊음, 전부터 잘 알던 이름이 생각 안 남. 직장/사회생활 문제 없음.'},
+    {n:3, label:'경미한 인지장애', desc:'낯선 곳 길 잃음, 귀중품 엉뚱한 곳, 직업/사회 수행 감퇴. 자세한 면담으로만 드러남.'},
+    {n:4, label:'중등도 인지장애', desc:'최근 사건/시사 기억 못함, 순차적 빼기 집중력 장애. 혼자 외출/금전관리에 지장.'},
+    {n:5, label:'조기 중증 인지장애', desc:'집주소·전화번호·가까운 친지 이름 기억 어려움. 다른 사람의 도움 없이 지낼 수 없음.'},
+    {n:6, label:'중증 인지장애', desc:'배우자 이름 종종 잊음, 최근 사건 거의 못 기억. 대소변 실수, 외출 시 도움 필요.'},
+    {n:7, label:'후기 중증 인지장애', desc:'모든 언어구사 능력 상실. 요실금, 기본 운동 능력 상실. 말기 치매.'},
+  ]
+},
+
+psqi: {
+  title: 'PSQI',
+  fullTitle: 'Pittsburgh Sleep Quality Index',
+  comment: '7개 영역 합산. 0~5 good sleeper, 6~16 sleep disturbance, 17이상 poor sleeper',
+  isPSQI: true,
+  interpret: (s) => {
+    if(s<=5) return 'Good Sleeper';
+    if(s<=16) return 'Sleep Disturbance';
+    return 'Poor Sleeper';
+  },
+  copyFmt: (d, s, i) => `${d}/ PSQI/ ${s}/ ${i}`,
+  pdfFmt: (n, d) => `${n}PSQI${d}`,
+}
+
+};
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const scores = {};
+for(const k in CLIN_SCALES) scores[k] = {};
+
+// PSQI inputs
+const psqiInputs = {
+  q1: null, q2: null, q3: null, q4: null,
+  q5a:null, q5b:null, q5c:null, q5d:null, q5e:null,
+  q5f:null, q5g:null, q5h:null, q5i:null, q5j:null,
+  q6: null, q7: null, q8: null, q9: null, q10: null
+};
+
+// MMSE state
+const mmseScores = new Array(30).fill(null);
+let gdsSelected = null;
+
+// ═══════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════
+
+function showPanel(id) {
+  document.querySelectorAll('.nav-item').forEach((n,i)=>{
+    const keys = Object.keys(CLIN_SCALES);
+    n.classList.toggle('active', keys[i]===id);
+  });
+  renderPanel(id);
+  // 2번째 선택항목 자동클릭 (index=1)
+  setTimeout(()=>{
+    if(id==='mmse') return; // MMSE는 별도처리
+    if(id==='bprs') {
+      const scale = CLIN_SCALES.bprs;
+      scale.items.forEach((_,idx)=>{
+        if(scores.bprs[idx]===undefined) bprsSelect(idx,1);
+      });
+    } else if(id==='psqi') {
+      // PSQI freq items: auto-select index 1
+      ['q5a','q5b','q5c','q5d','q5e','q5f','q5g','q5h','q5i','q5j','q6','q7','q8','q9','q10'].forEach(k=>{
+        if(psqiInputs[k]===null) psqiSet(k,1);
+      });
+    } else {
+      const scale = CLIN_SCALES[id];
+      if(!scale||!scale.items) return;
+      scale.items.forEach((item,idx)=>{
+        if(item.type==='number') return;
+        if(scores[id][idx]===undefined && item.opts && item.opts.length>1) {
+          selectScore(id,idx,1);
+        }
+      });
+    }
+  }, 50);
+}
+
+function renderPanel(id) {
+  const container = document.getElementById('mainContent');
+  const scale = CLIN_SCALES[id];
+  // Save print-info bar HTML before overwriting
+  const printBar = document.getElementById('printInfoBar');
+  const printBarHTML = printBar ? printBar.outerHTML : '';
+
+  const setContent = (html) => { container.innerHTML = printBarHTML + html; };
+
+  if(id === 'psqi') {
+    setContent(renderPSQI());
+    attachPSQIListeners();
+    return;
+  }
+  if(id === 'mmse') {
+    setContent(renderMMSE());
+    attachMMSEListeners();
+    return;
+  }
+  if(id === 'bprs') {
+    setContent(renderBPRS());
+    attachBPRSListeners();
+    return;
+  }
+
+  let html = `
+    <div class="scale-header">
+      <div class="scale-title">${scale.title}</div>
+      <div class="scale-meta">${scale.fullTitle} &nbsp;·&nbsp; ${scale.comment}</div>
+    </div>
+  `;
+
+  scale.items.forEach((item, idx) => {
+    if(item.type === 'number') {
+      html += `
+        <div class="item-card" id="card-${id}-${idx}">
+          <div class="item-header"><span class="item-num">${idx+1}</span>${item.q}</div>
+          <div class="item-input">
+            <input type="number" class="num-input" id="ninput-${id}-${idx}"
+              placeholder="${item.placeholder||''}" min="0"
+              onchange="setNumScore('${id}',${idx},this.value)">
+            <span style="font-size:12px;color:var(--text3)">${item.unit||''}</span>
+          </div>
+        </div>`;
+    } else {
+      const curScore = scores[id][idx];
+      const isScored = curScore !== undefined;
+      html += `
+        <div class="item-card ${isScored?'scored':''}" id="card-${id}-${idx}">
+          <div class="item-header"><span class="item-num">${idx+1}</span>${item.q}</div>
+          <div class="options">
+            ${item.opts.map((opt,si)=>`
+              <button class="opt-btn ${curScore===si?'selected':''}"
+                onclick="selectScore('${id}',${idx},${si})">
+                <span class="opt-score">${si}</span>
+                <span>${opt}</span>
+              </button>`).join('')}
+          </div>
+        </div>`;
+    }
+  });
+
+  html += renderScoreFooter(id);
+  setContent(html);
+}
+
+function renderScoreFooter(id) {
+  const scale = CLIN_SCALES[id];
+  const total = calcTotal(id);
+  const interp = scale.interpret(total);
+  return `
+    <div class="score-footer">
+      <div>
+        <div class="score-big">${total}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">총점</div>
+      </div>
+      <div class="score-interp">
+        <strong>${interp}</strong>
+      </div>
+      <div class="score-actions">
+        <button class="btn btn-outline" onclick="copyResult('${id}')">📋 챠트 복사</button>
+        <button class="btn btn-primary" onclick="printPDF('${id}')">🖨 PDF 출력</button>
+        <button class="btn btn-success" onclick="savePDF('${id}')">💾 바로저장</button>
+      </div>
+    </div>`;
+}
+
+function calcTotal(id) {
+  const scale = CLIN_SCALES[id];
+  if(scale.isPSQI) return calcPSQI().total;
+  if(scale.isMMSE) return mmseScores.filter(s=>s===1).length;
+  const items = scale.items || [];
+  return items.reduce((sum, item, idx) => {
+    const v = scores[id][idx];
+    if(v===undefined || v===null) return sum;
+    if(item.type==='number') return sum; // days not counted in score
+    return sum + v;
+  }, 0);
+}
+
+// ═══════════════════════════════════════════════════
+// SCORE SELECTION
+// ═══════════════════════════════════════════════════
+function selectScore(scaleId, itemIdx, score) {
+  scores[scaleId][itemIdx] = score;
+  // Re-render just the card
+  const card = document.getElementById(`card-${scaleId}-${itemIdx}`);
+  const scale = CLIN_SCALES[scaleId];
+  const item = scale.items[itemIdx];
+  card.classList.add('scored');
+  card.querySelector('.options').innerHTML = item.opts.map((opt,si)=>`
+    <button class="opt-btn ${score===si?'selected':''}"
+      onclick="selectScore('${scaleId}',${itemIdx},${si})">
+      <span class="opt-score">${si}</span>
+      <span>${opt}</span>
+    </button>`).join('');
+  // Update footer
+  updateFooter(scaleId);
+  updateBadge(scaleId);
+}
+
+function setNumScore(scaleId, itemIdx, val) {
+  scores[scaleId][itemIdx] = parseFloat(val)||0;
+}
+
+function updateFooter(id) {
+  const footer = document.querySelector('.score-footer');
+  if(!footer) return;
+  const scale = CLIN_SCALES[id];
+  const total = calcTotal(id);
+  const interp = scale.interpret(total);
+  footer.querySelector('.score-big').textContent = total;
+  footer.querySelector('.score-interp strong').textContent = interp;
+}
+
+function updateBadge(id) {
+  const scale = CLIN_SCALES[id];
+  const badge = document.getElementById(`badge-${id}`);
+  if(!badge) return;
+  if(id==='psqi') return;
+  if(scale.isMMSE) {
+    const scored = mmseScores.filter(s=>s!==null).length;
+    if(scored>0) {
+      badge.textContent = `${scored}/30`;
+      badge.parentElement.classList.add('done');
+    }
+    return;
+  }
+  const items = scale.items||[];
+  const scoredCount = items.filter((_,i)=>scores[id][i]!==undefined).length;
+  if(scoredCount>0) {
+    badge.textContent = `${scoredCount}/${items.length}`;
+    badge.parentElement.classList.add('done');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// BPRS (chip style)
+// ═══════════════════════════════════════════════════
+function renderBPRS() {
+  const scale = CLIN_SCALES.bprs;
+  let html = `
+    <div class="scale-header">
+      <div class="scale-title">${scale.title}</div>
+      <div class="scale-meta">${scale.fullTitle} &nbsp;·&nbsp; ${scale.comment}</div>
+    </div>`;
+
+  scale.items.forEach((item, idx) => {
+    const cur = scores.bprs[idx];
+    html += `
+      <div class="item-card ${cur!==undefined?'scored':''}" id="card-bprs-${idx}">
+        <div class="item-header"><span class="item-num">${idx+1}</span>${item.q}</div>
+        <div class="options-row">
+          ${item.opts.map((opt,si)=>`
+            <button class="opt-chip ${cur===si?'selected':''}"
+              onclick="bprsSelect(${idx},${si})">${opt}</button>`).join('')}
+        </div>
+      </div>`;
+  });
+
+  const total = calcTotal('bprs');
+  const s = scores.bprs;
+  const th = (s[3]||0)+(s[11]||0)+(s[14]||0);
+  const hs = (s[9]||0)+(s[10]||0)+(s[13]||0);
+  const ws = (s[2]||0)+(s[12]||0)+(s[15]||0);
+  const ds = (s[5]||0)+(s[16]||0);
+  const as2 = (s[1]||0)+(s[4]||0)+(s[8]||0);
+
+  html += `
+    <div class="score-footer" id="bprs-footer">
+      <div>
+        <div class="score-big">${total}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">총점</div>
+      </div>
+      <div class="sub-scores" style="flex:1">
+        <div class="sub-item"><span>사고장애 (4,12,15)</span><span class="sub-val">${th}</span></div>
+        <div class="sub-item"><span>적대의심 (10,11,14)</span><span class="sub-val">${hs}</span></div>
+        <div class="sub-item"><span>철퇴지연 (3,13,16)</span><span class="sub-val">${ws}</span></div>
+        <div class="sub-item"><span>동요흥분 (6,17)</span><span class="sub-val">${ds}</span></div>
+        <div class="sub-item"><span>불안우울 (2,5,9)</span><span class="sub-val">${as2}</span></div>
+      </div>
+      <div class="score-actions" style="flex-direction:column">
+        <button class="btn btn-outline" onclick="copyResult('bprs')">📋 챠트 복사</button>
+        <button class="btn btn-primary" onclick="printPDF('bprs')">🖨 PDF 출력</button>
+        <button class="btn btn-success" onclick="savePDF('bprs')">💾 바로저장</button>
+      </div>
+    </div>`;
+
+  return html;
+}
+
+function attachBPRSListeners() {}
+window.bprsSelect = function(idx, si) {
+  scores.bprs[idx] = si;
+  const card = document.getElementById(`card-bprs-${idx}`);
+  card.classList.add('scored');
+  card.querySelector('.options-row').innerHTML = CLIN_SCALES.bprs.items[idx].opts.map((opt,s2)=>`
+    <button class="opt-chip ${si===s2?'selected':''}"
+      onclick="bprsSelect(${idx},${s2})">${opt}</button>`).join('');
+  const total = calcTotal('bprs');
+  const s = scores.bprs;
+  document.querySelector('#bprs-footer .score-big').textContent = total;
+  document.querySelector('#bprs-footer .sub-scores').innerHTML = `
+    <div class="sub-item"><span>사고장애 (4,12,15)</span><span class="sub-val">${(s[3]||0)+(s[11]||0)+(s[14]||0)}</span></div>
+    <div class="sub-item"><span>적대의심 (10,11,14)</span><span class="sub-val">${(s[9]||0)+(s[10]||0)+(s[13]||0)}</span></div>
+    <div class="sub-item"><span>철퇴지연 (3,13,16)</span><span class="sub-val">${(s[2]||0)+(s[12]||0)+(s[15]||0)}</span></div>
+    <div class="sub-item"><span>동요흥분 (6,17)</span><span class="sub-val">${(s[5]||0)+(s[16]||0)}</span></div>
+    <div class="sub-item"><span>불안우울 (2,5,9)</span><span class="sub-val">${(s[1]||0)+(s[4]||0)+(s[8]||0)}</span></div>`;
+  updateBadge('bprs');
+};
+
+// ═══════════════════════════════════════════════════
+// MMSE & GDS
+// ═══════════════════════════════════════════════════
+function renderMMSE() {
+  const scale = CLIN_SCALES.mmse;
+  let lastCat = '';
+  let html = `
+    <div class="scale-header">
+      <div class="scale-title">${scale.title}</div>
+      <div class="scale-meta">${scale.fullTitle} &nbsp;·&nbsp; ${scale.comment}</div>
+    </div>`;
+
+  html += `<div style="font-size:13px;font-weight:500;color:var(--text2);margin-bottom:14px">MMSE (Mini-Mental State Exam)</div>`;
+  scale.mmseItems.forEach((item, idx) => {
+    if(item.cat !== lastCat) {
+      html += `<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin:16px 0 8px;padding-left:4px">${item.cat}</div>`;
+      lastCat = item.cat;
+    }
+    const cur = mmseScores[idx];
+    html += `
+      <div class="item-card ${cur!==null?'scored':''}" id="mmse-card-${idx}" style="margin-bottom:8px">
+        <div style="padding:10px 18px;display:flex;align-items:center;gap:12px">
+          <span class="item-num">${idx+1}</span>
+          <span style="font-size:13px;flex:1">${item.q}</span>
+          <button class="opt-chip ${cur===1?'selected':''}" onclick="mmseSet(${idx},1)">맞음 (1)</button>
+          <button class="opt-chip ${cur===0?'selected':''}" onclick="mmseSet(${idx},0)">틀림 (0)</button>
+        </div>
+      </div>`;
+  });
+
+  html += `<div style="font-size:13px;font-weight:500;color:var(--text2);margin:24px 0 14px">GDS (Global Deterioration Scale)</div>`;
+  html += `<div class="gds-options">`;
+  scale.gdsStages.forEach(stage => {
+    html += `
+      <button class="gds-opt ${gdsSelected===stage.n?'selected':''}" id="gds-${stage.n}" onclick="gdsSet(${stage.n})">
+        <span class="gds-stage">단계 ${stage.n}: ${stage.label}</span>
+        ${stage.desc}
+      </button>`;
+  });
+  html += `</div>`;
+
+  const mmseTotal = mmseScores.filter(s=>s===1).length;
+  html += `
+    <div class="score-footer" id="mmse-footer">
+      <div>
+        <div class="score-big">${mmseTotal}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">MMSE 총점</div>
+      </div>
+      <div class="score-interp">
+        <strong>GDS ${gdsSelected ? '단계 '+gdsSelected : '미선택'}</strong>
+      </div>
+      <div class="score-actions">
+        <button class="btn btn-outline" onclick="copyResult('mmse')">📋 챠트 복사</button>
+        <button class="btn btn-primary" onclick="printPDF('mmse')">🖨 PDF 출력</button>
+        <button class="btn btn-success" onclick="savePDF('mmse')">💾 바로저장</button>
+      </div>
+    </div>`;
+  return html;
+}
+
+function attachMMSEListeners() {}
+window.mmseSet = function(idx, val) {
+  mmseScores[idx] = val;
+  const card = document.getElementById(`mmse-card-${idx}`);
+  card.classList.add('scored');
+  card.querySelectorAll('.opt-chip').forEach((btn,i)=>{
+    btn.classList.toggle('selected', i===0? val===1 : val===0);
+  });
+  const total = mmseScores.filter(s=>s===1).length;
+  document.querySelector('#mmse-footer .score-big').textContent = total;
+  updateBadge('mmse');
+};
+window.gdsSet = function(n) {
+  gdsSelected = n;
+  document.querySelectorAll('.gds-opt').forEach(el=>{
+    el.classList.remove('selected');
+  });
+  document.getElementById(`gds-${n}`).classList.add('selected');
+  document.querySelector('#mmse-footer .score-interp strong').textContent = 'GDS 단계 '+n;
+};
+
+// ═══════════════════════════════════════════════════
+// PSQI
+// ═══════════════════════════════════════════════════
+function renderPSQI() {
+  const scale = CLIN_SCALES.psqi;
+  const freqOpts = ['지난 한달 없었다(0)','한 주에 1번보다 적게(1)','한 주에 1~2번 정도(2)','한 주에 3번 이상(3)'];
+
+  let html = `
+    <div class="scale-header">
+      <div class="scale-title">${scale.title}</div>
+      <div class="scale-meta">${scale.fullTitle} &nbsp;·&nbsp; ${scale.comment}</div>
+    </div>`;
+
+  // Q1
+  html += psqiNumItem('q1','1. 평소 취침 시간 (24시간제)','예) 23 (= 오후 11시)', 'q1-input');
+  html += psqiNumItem('q2','2. 잠드는 데 걸리는 시간 (분)','예) 30', 'q2-input');
+  html += psqiNumItem('q3','3. 평소 기상 시간 (24시간제)','예) 07', 'q3-input');
+  html += psqiNumItem('q4','4. 실제 수면 시간 (시간)','예) 5.5', 'q4-input');
+
+  // Q5
+  const q5items = [
+    ['q5a','5a. 취침 후 30분 이내에 잠들 수 없었다'],
+    ['q5b','5b. 한밤중이나 새벽에 깼다'],
+    ['q5c','5c. 화장실에 가려고 일어나야 했다'],
+    ['q5d','5d. 편안하게 숨 쉴 수가 없었다'],
+    ['q5e','5e. 기침·시끄럽게 코를 골았다'],
+    ['q5f','5f. 너무 춥다고 느꼈다'],
+    ['q5g','5g. 너무 덥다고 느꼈다'],
+    ['q5h','5h. 나쁜 꿈을 꾸었다'],
+    ['q5i','5i. 통증이 있었다'],
+    ['q5j','5j. 기타'],
+  ];
+  q5items.forEach(([key,label])=>{
+    html += psqiFreqItem(key, label, freqOpts);
+  });
+
+  // Q6-Q9 single choice
+  html += psqiFreqItem('q6','6. 전반적인 수면의 질', ['매우 좋음(0)','상당히 좋음(1)','상당히 나쁨(2)','매우 나쁨(3)']);
+  html += psqiFreqItem('q7','7. 잠이 들기 위해 약을 복용한 빈도', freqOpts);
+  html += psqiFreqItem('q8','8. 졸음 (운전·식사·사회활동 중)', freqOpts);
+  html += psqiFreqItem('q9','9. 일에 열중하는 데 문제가 있었던 빈도', freqOpts);
+  html += psqiFreqItem('q10','10. 함께 자는 사람', ['없음(0)','집에 다른 방 쓰는 사람(1)','방 같이 쓰지만 다른 침대(2)','같은 잠자리(3)']);
+
+  const psqi = calcPSQI();
+  html += `
+    <div class="score-footer" id="psqi-footer">
+      <div>
+        <div class="score-big">${psqi.total}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">총점</div>
+      </div>
+      <div>
+        <div class="score-interp"><strong>${scale.interpret(psqi.total)}</strong></div>
+        <div class="psqi-comps">
+          <div class="psqi-comp"><div class="psqi-comp-name">주관적 수면질</div><div class="psqi-comp-val">${psqi.c1}</div></div>
+          <div class="psqi-comp"><div class="psqi-comp-name">수면 잠복기</div><div class="psqi-comp-val">${psqi.c2}</div></div>
+          <div class="psqi-comp"><div class="psqi-comp-name">수면 시간</div><div class="psqi-comp-val">${psqi.c3}</div></div>
+          <div class="psqi-comp"><div class="psqi-comp-name">수면 효율</div><div class="psqi-comp-val">${psqi.c4}</div></div>
+          <div class="psqi-comp"><div class="psqi-comp-name">수면 방해</div><div class="psqi-comp-val">${psqi.c5}</div></div>
+          <div class="psqi-comp"><div class="psqi-comp-name">수면제 사용</div><div class="psqi-comp-val">${psqi.c6}</div></div>
+          <div class="psqi-comp"><div class="psqi-comp-name">낮 기능 장애</div><div class="psqi-comp-val">${psqi.c7}</div></div>
+        </div>
+      </div>
+      <div class="score-actions" style="flex-direction:column">
+        <button class="btn btn-outline" onclick="copyResult('psqi')">📋 챠트 복사</button>
+        <button class="btn btn-primary" onclick="printPDF('psqi')">🖨 PDF 출력</button>
+        <button class="btn btn-success" onclick="savePDF('psqi')">💾 바로저장</button>
+      </div>
+    </div>`;
+
+  return html;
+}
+
+function psqiNumItem(key, label, ph, inputId) {
+  const curVal = psqiInputs[key] !== null ? psqiInputs[key] : '';
+  return `
+    <div class="item-card ${curVal !== '' ? 'scored' : ''}">
+      <div class="item-header" style="padding-bottom:4px">${label}</div>
+      <div class="item-input">
+        <input type="number" class="num-input" placeholder="${ph}" id="psqi-${key}"
+          value="${curVal}"
+          oninput="psqiNumSet('${key}', parseFloat(this.value)||0)">
+      </div>
+    </div>`;
+}
+function psqiFreqItem(key, label, opts) {
+  const cur = psqiInputs[key];
+  return `
+    <div class="item-card ${cur!==null?'scored':''}">
+      <div class="item-header" style="padding-bottom:4px">${label}</div>
+      <div class="options-row">
+        ${opts.map((opt,si)=>`<button class="opt-chip ${cur===si?'selected':''}"
+          onclick="psqiSet('${key}',${si})">${opt}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function attachPSQIListeners() {
+  // Restore number input values after re-render
+  ['q1','q2','q3','q4'].forEach(key => {
+    const el = document.getElementById(`psqi-${key}`);
+    if(el && psqiInputs[key] !== null) el.value = psqiInputs[key];
+  });
+}
+window.psqiNumSet = function(key, val) {
+  psqiInputs[key] = val;
+  updatePSQIFooter();
+};
+window.psqiSet = function(key, val) {
+  psqiInputs[key] = val;
+  updatePSQIFooter();
+  // Only re-render for button/chip selections (not number inputs)
+  if(!['q1','q2','q3','q4'].includes(key)) {
+    // Save number input values before re-render
+    const numVals = {};
+    ['q1','q2','q3','q4'].forEach(k => {
+      const el = document.getElementById(`psqi-${k}`);
+      if(el) numVals[k] = el.value;
+    });
+    renderPanel('psqi');
+    // Restore number input values after re-render
+    ['q1','q2','q3','q4'].forEach(k => {
+      const el = document.getElementById(`psqi-${k}`);
+      if(el && numVals[k]) el.value = numVals[k];
+    });
+  }
+};
+
+function updatePSQIFooter() {
+  const footer = document.getElementById('psqi-footer');
+  if(!footer) return;
+  const psqi = calcPSQI();
+  footer.querySelector('.score-big').textContent = psqi.total;
+  footer.querySelector('.score-interp strong').textContent = CLIN_SCALES.psqi.interpret(psqi.total);
+  const comps = footer.querySelectorAll('.psqi-comp-val');
+  [psqi.c1,psqi.c2,psqi.c3,psqi.c4,psqi.c5,psqi.c6,psqi.c7].forEach((v,i)=>comps[i].textContent=v);
+}
+
+function calcPSQI() {
+  const pi = psqiInputs;
+  // C1
+  const c1 = pi.q6 !== null ? pi.q6 : 0;
+  // C2
+  let q2score = 0;
+  const q2val = pi.q2||0;
+  if(q2val<=15) q2score=0; else if(q2val<=30) q2score=1; else if(q2val<=60) q2score=2; else q2score=3;
+  const c2sum = q2score + (pi.q5a||0);
+  const c2 = c2sum===0?0 : c2sum<=2?1 : c2sum<=4?2 : 3;
+  // C3
+  const sl = pi.q4||0;
+  const c3 = sl>=7?0 : sl>=6?1 : sl>=5?2 : 3;
+  // C4
+  let c4 = 0;
+  if(pi.q1!==null && pi.q3!==null && pi.q4!==null) {
+    let bedHrs = pi.q3 - pi.q1;
+    if(bedHrs<=0) bedHrs+=24;
+    if(bedHrs>0) {
+      const eff = (pi.q4/bedHrs)*100;
+      c4 = eff>=85?0 : eff>=75?1 : eff>=65?2 : 3;
+    }
+  }
+  // C5
+  const c5sum = ['q5b','q5c','q5d','q5e','q5f','q5g','q5h','q5i','q5j'].reduce((a,k)=>a+(pi[k]||0),0);
+  const c5 = c5sum===0?0 : c5sum<=9?1 : c5sum<=18?2 : 3;
+  // C6
+  const c6 = pi.q7!==null?pi.q7:0;
+  // C7
+  const c7sum = (pi.q8||0)+(pi.q9||0);
+  const c7 = c7sum===0?0 : c7sum<=2?1 : c7sum<=4?2 : 3;
+
+  return {c1,c2,c3,c4,c5,c6,c7, total:c1+c2+c3+c4+c5+c6+c7};
+}
+
+// ═══════════════════════════════════════════════════
+// COPY & PDF
+// ═══════════════════════════════════════════════════
+function copyResult(id) {
+  const date = document.getElementById('ptDate').value || '날짜미입력';
+  const scale = CLIN_SCALES[id];
+  let text = '';
+
+  if(id === 'bprs') {
+    const total = calcTotal('bprs');
+    text = scale.copyFmt(date, total, '', scores.bprs);
+  } else if(id === 'mmse') {
+    const mmseTotal = mmseScores.filter(s=>s===1).length;
+    const stage = gdsSelected || '미선택';
+    text = scale.copyFmt(date, mmseTotal, stage);
+  } else if(id === 'psqi') {
+    const psqi = calcPSQI();
+    const interp = scale.interpret(psqi.total);
+    text = scale.copyFmt(date, psqi.total, interp);
+  } else {
+    const total = calcTotal(id);
+    const interp = scale.interpret(total);
+    text = scale.copyFmt(date, total, interp);
+  }
+
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast('클립보드에 복사되었습니다:\n' + text);
+  }).catch(()=>{
+    showToast('복사 내용:\n' + text);
+  });
+}
+
+function printPDF(id) {
+  const ptNum = document.getElementById('ptNum').value || '환자번호';
+  const date = document.getElementById('ptDate').value || '날짜';
+  const scale = CLIN_SCALES[id];
+  const filename = scale.pdfFmt(ptNum, date);
+  const origTitle = document.title;
+
+  // Populate print info bar
+  const bar = document.getElementById('printInfoBar');
+  document.getElementById('printInfoLeft').textContent = `환자번호: ${ptNum}   검사날짜: ${date}`;
+  document.getElementById('printInfoRight').textContent = filename;
+
+  document.title = filename;
+  showToast(`PDF 파일명: ${filename}\n(브라우저 인쇄 → PDF로 저장)`);
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => { document.title = origTitle; }, 1000);
+  }, 800);
+}
+
+function savePDF(id) {
+  const ptNum = document.getElementById('ptNum').value || '환자번호';
+  const date = document.getElementById('ptDate').value || '날짜';
+  const scale = CLIN_SCALES[id];
+  const filename = scale.pdfFmt(ptNum, date);
+
+  // Gather all computed styles from the current document
+  const allStyles = Array.from(document.styleSheets).map(ss => {
+    try { return Array.from(ss.cssRules).map(r => r.cssText).join('\n'); }
+    catch(e) { return ''; }
+  }).join('\n');
+
+  // Clone the main content area
+  const mainEl = document.getElementById('mainContent');
+  if(!mainEl) { showToast('콘텐츠를 찾을 수 없습니다.'); return; }
+  const clone = mainEl.cloneNode(true);
+  // Remove action buttons and print-info bar
+  clone.querySelectorAll('.score-actions, #printInfoBar').forEach(el => el.remove());
+
+  const html = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>${filename}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap');
+${allStyles}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans KR', sans-serif; background: #fff; color: #1a1f36; padding: 16px 20px; }
+.print-header { display: flex; justify-content: space-between; font-size: 11px; color: #555; border-bottom: 1px solid #ccc; padding-bottom: 6px; margin-bottom: 14px; }
+.main { padding: 0 !important; max-width: 100% !important; }
+.score-actions { display: none !important; }
+@media print {
+  @page { size: A4 portrait; margin: 10mm 12mm; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { padding: 0; }
+}
+</style>
+</head>
+<body>
+<div class="print-header">
+  <span>환자번호: ${ptNum} &nbsp;&nbsp; 검사날짜: ${date}</span>
+  <span>${filename}</span>
+</div>
+${clone.outerHTML}
+<script>
+  window.onload = function() {
+    window.focus();
+    window.print();
+    setTimeout(function(){ window.close(); }, 1200);
+  };
+<\/script>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank', 'width=900,height=800');
+  if(!win) { showToast('팝업 차단을 해제해 주세요.'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.document.title = filename;
+}
+
+function resetAll() {
+  if(!confirm('모든 검사 결과를 초기화하시겠습니까?')) return;
+  for(const k in scores) for(const i in scores[k]) delete scores[k][i];
+  mmseScores.fill(null);
+  gdsSelected = null;
+  for(const k in psqiInputs) psqiInputs[k] = null;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('done'));
+  // showPanel deferred to clinLogin
+  showToast('초기화되었습니다.');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+// showPanel deferred to clinLogin
+
+
+// ═══ 임상가 척도 로직 ═══
+let clinUnlocked = false;
+
+function clinLogin(){
+  const pw = document.getElementById('clin-pw').value;
+  if(pw === 'hanriver1000'){
+    clinUnlocked = true;
+    document.getElementById('clin-lock').style.display = 'none';
+    document.getElementById('clin-body').style.display = 'block';
+    const now = new Date();
+    const ptDate = document.getElementById('ptDate');
+    if(ptDate && !ptDate.value){
+      ptDate.value = String(now.getFullYear()).slice(2)+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
+    }
+    showPanel('hamd');
+  } else {
+    const err = document.getElementById('clin-err');
+    if(err) err.textContent = '비밀번호가 올바르지 않습니다.';
+    document.getElementById('clin-pw').value = '';
+  }
+}
+
+async function saveClinResult(){
+  const ptNum = (document.getElementById('ptNum')?.value||'').trim();
+  const ptDate = (document.getElementById('ptDate')?.value||'').trim();
+  if(!ptNum){ toast('환자번호를 입력하세요.'); return; }
+  
+  const activeNav = document.querySelector('.nav-item.active');
+  if(!activeNav){ toast('검사를 선택하세요.'); return; }
+  const scaleId = (activeNav.getAttribute('onclick')||'').match(/showPanel\('(\w+)'\)/)?.[1];
+  if(!scaleId){ toast('검사를 선택하세요.'); return; }
+  
+  const scale = CLIN_SCALES[scaleId];
+  let total=0, interp='', copyText='', extraScores='';
+  
+  try {
+    if(scaleId==='psqi'){
+      const psqi=calcPSQI(); total=psqi.total; interp=scale.interpret(total);
+      copyText=scale.copyFmt(ptDate,total,interp,psqi);
+      extraScores=JSON.stringify({s1:total,display:String(total),interp});
+    } else if(scaleId==='mmse'){
+      total=mmseScores.filter(s=>s===1).length; const stage=gdsSelected||'미선택'; interp=stage;
+      copyText=scale.copyFmt(ptDate,total,stage);
+      extraScores=JSON.stringify({s1:total,display:total+'/GDS:'+stage,interp:stage});
+    } else if(scaleId==='bprs'){
+      total=calcTotal('bprs'); interp=scale.interpret?scale.interpret(total):'';
+      copyText=scale.copyFmt(ptDate,total,interp,scores.bprs);
+      extraScores=JSON.stringify({s1:total,display:String(total),interp});
+    } else {
+      total=calcTotal(scaleId); interp=scale.interpret?scale.interpret(total):'';
+      copyText=scale.copyFmt(ptDate,total,interp);
+      extraScores=JSON.stringify({s1:total,display:String(total),interp});
+    }
+  } catch(e){ toast('계산 오류: '+e.message); return; }
+  
+  // 세션 ID: c-환자번호-날짜
+  const sessId='c-'+ptNum+'-'+(ptDate||'000000');
+  const completedAt=ptDate?'20'+ptDate.slice(0,2)+'-'+ptDate.slice(2,4)+'-'+ptDate.slice(4,6)+' 00:00:00':new Date().toISOString();
+  
+  // sessions upsert
+  const{data:existSess}=await sb.from('sessions').select('id,scales').eq('id',sessId).maybeSingle();
+  if(!existSess){
+    await sb.from('sessions').insert({id:sessId,patient_name:ptNum,scales:[scaleId],status:'완료',created_at:completedAt});
+  } else {
+    const newScales=[...new Set([...(existSess.scales||[]),scaleId])];
+    await sb.from('sessions').update({scales:newScales}).eq('id',sessId);
+  }
+  
+  // results upsert
+  const{error}=await sb.from('results').upsert({
+    session_id:sessId,scale_id:scaleId,patient_name:ptNum,
+    score:total,interp,copy_text:copyText,extra_scores:extraScores,
+    answers:null,completed_at:completedAt
+  },{onConflict:'session_id,scale_id'});
+  
+  if(error){toast('저장 실패: '+error.message);return;}
+  toast('✅ '+scale.title+' 저장! ('+ptNum+')');
+}
 
 </script>
 </body>
