@@ -572,9 +572,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <div class="screen active" id="s-admin">
   <div class="hdr">정신건강 검사 관리 (일반용)</div>
-  <div class="sub-hdr">
+  <div class="sub-hdr" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr">
     <span class="act" onclick="switchSubTab('issue',this)">검사 선택</span>
     <span onclick="switchSubTab('status',this)">완료 현황</span>
+    <span onclick="switchSubTab('daeri',this)">대리 처방</span>
+    <span onclick="switchSubTab('chojin',this)">초진 접수</span>
     <span onclick="switchSubTab('clin',this)">임상가 척도</span>
   </div>
   <div class="tab-content act" id="tab-issue">
@@ -618,6 +620,259 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div id="status-list-body"><div class="empty"><div class="spinner"></div></div></div>
     </div>
   </div>
+  <!-- ══ 대리처방 탭 ══ -->
+  <div class="tab-content" id="tab-daeri">
+  <div style="max-width:680px;margin:0 auto;padding:16px 16px 60px">
+    <div style="display:inline-block;background:#1a3a5c;color:white;font-size:0.78rem;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:0.08em;margin-bottom:20px">처방전 대리수령 신청서</div>
+
+    <!-- 차트번호 -->
+    <div style="background:#fff8e8;border:2px dashed #c8a96e;border-radius:14px;padding:18px 20px;margin-bottom:24px">
+      <div style="font-size:0.78rem;font-weight:700;color:#a07830;letter-spacing:0.06em;margin-bottom:8px">🔒 접수 담당자 입력란</div>
+      <div id="dr-chart-input-wrap2">
+        <div style="margin-bottom:10px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">0</span> 차트번호</label>
+          <input type="text" id="dr-chart2" placeholder="차트번호 입력" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+        </div>
+        <button onclick="drProceedChart()" style="padding:11px 20px;background:#c8a96e;color:white;border:none;border-radius:8px;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:10px">확인 후 진행 ▶</button>
+      </div>
+      <div id="dr-chart-locked2" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#e8f4ea;border-radius:8px;border:1.5px solid #27ae60;margin-top:10px">
+          <span style="font-size:0.88rem;font-weight:600;color:#1e7e34" id="dr-chart-display2"></span>
+          <button onclick="drEditChart()" style="margin-left:auto;padding:4px 12px;background:white;border:1px solid #27ae60;border-radius:6px;font-size:0.78rem;color:#1e7e34;cursor:pointer">수정</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 폼 바디 -->
+    <div id="dr-form-body2" style="display:none">
+
+      <!-- 방문자 섹션 -->
+      <div style="background:#f0f4f9;border-left:4px solid #2a5a8c;border-radius:0 10px 10px 0;padding:16px 18px;margin:10px 0 20px">
+        <div style="font-size:0.85rem;font-weight:700;color:#1a3a5c;margin-bottom:14px;letter-spacing:0.04em">👤 대리수령자 (방문자) 정보</div>
+
+        <div style="margin-bottom:20px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">1</span> 성 명</label>
+          <input type="text" id="dr2-visitor-name" placeholder="홍길동" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+          <div class="err-msg" id="dr2-visitor-name-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">성명을 입력해주세요.</div>
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">2</span> 연 락 처</label>
+          <input type="tel" id="dr2-visitor-phone" placeholder="01012345678" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+          <div class="err-msg" id="dr2-visitor-phone-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">연락처를 입력해주세요.</div>
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">3</span> 생 년 월 일</label>
+          <input type="text" id="dr2-visitor-birth" placeholder="19811231" maxlength="8" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+          <div style="font-size:0.78rem;color:#888;margin-top:6px">예: 19811231</div>
+          <div class="err-msg" id="dr2-visitor-birth-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">생년월일을 입력해주세요.</div>
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">4</span> 환자와의 관계</label>
+          <div id="dr2-relation-group" style="display:flex;flex-direction:column;gap:10px">
+            <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-relation')"><input type="radio" name="dr2-relation" value="직계존속 (어머니, 아버지, 외할머니, 외할아버지, 친할머니, 친할아버지)"><span>① 직계존속 (어머니, 아버지, 외·친 조부모)</span></label>
+            <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-relation')"><input type="radio" name="dr2-relation" value="직계비속 (아들, 딸, 손자, 손녀, 증손자, 증손녀)"><span>② 직계비속 (아들, 딸, 손자, 손녀, 증손자·녀)</span></label>
+            <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-relation')"><input type="radio" name="dr2-relation" value="배우자 (남편, 아내)"><span>③ 배우자 (남편, 아내)</span></label>
+            <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-relation')"><input type="radio" name="dr2-relation" value="직계비속의 배우자 (아들, 딸, 손자, 손녀, 증손자, 증손녀의 배우자)"><span>④ 직계비속의 배우자</span></label>
+            <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-relation')"><input type="radio" name="dr2-relation" value="배우자의 직계존속 (장인, 장모, 시어머니, 시아버지)"><span>⑤ 배우자의 직계존속 (장인·장모·시부모)</span></label>
+            <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-relation')"><input type="radio" name="dr2-relation" value="형제자매"><span>⑥ 형제자매</span></label>
+            <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-relation')"><input type="radio" name="dr2-relation" value="노인복지법 제34조에 따른 노인의료복지시설 종사자 (재직증명서 필요)"><span>⑦ 노인의료복지시설 종사자 <span style="color:#c0392b;font-size:0.8rem">(재직증명서 필요)</span></span></label>
+            <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-relation')"><input type="radio" name="dr2-relation" value="장애인복지법 제58조에 따른 장애인 거주시설 종사자 (재직증명서 필요)"><span>⑧ 장애인 거주시설 종사자 <span style="color:#c0392b;font-size:0.8rem">(재직증명서 필요)</span></span></label>
+          </div>
+          <div class="err-msg" id="dr2-relation-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">관계를 선택해주세요.</div>
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">5</span> 주 소</label>
+          <input type="text" id="dr2-visitor-addr" placeholder="예) 서울시 강남구 역삼동" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+          <div class="err-msg" id="dr2-visitor-addr-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">주소를 입력해주세요.</div>
+        </div>
+      </div>
+
+      <!-- 환자 섹션 -->
+      <div style="background:#f0f4f9;border-left:4px solid #2a5a8c;border-radius:0 10px 10px 0;padding:16px 18px;margin:10px 0 20px">
+        <div style="font-size:0.85rem;font-weight:700;color:#1a3a5c;margin-bottom:14px;letter-spacing:0.04em">🏥 환 자 정보</div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">6</span> 성 명</label>
+          <input type="text" id="dr2-patient-name" placeholder="홍삼순" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+          <div class="err-msg" id="dr2-patient-name-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">환자 성명을 입력해주세요.</div>
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">7</span> 연 락 처</label>
+          <input type="tel" id="dr2-patient-phone" placeholder="01087654321" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+          <div class="err-msg" id="dr2-patient-phone-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">연락처를 입력해주세요.</div>
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">8</span> 생 년 월 일</label>
+          <input type="text" id="dr2-patient-birth" placeholder="19510126" maxlength="8" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+          <div style="font-size:0.78rem;color:#888;margin-top:6px">예: 19510126</div>
+          <div class="err-msg" id="dr2-patient-birth-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">생년월일을 입력해주세요.</div>
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">9</span> 주 소</label>
+          <input type="text" id="dr2-patient-addr" placeholder="예) 상동 / 서울시 강남구 역삼동" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+          <div class="err-msg" id="dr2-patient-addr-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">주소를 입력해주세요.</div>
+        </div>
+      </div>
+
+      <!-- 대리수령 사유 -->
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">10</span> 대리수령 사유</label>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-reason')"><input type="radio" name="dr2-reason" value="환자의 의식이 없는 경우"><span>① 환자의 의식이 없는 경우</span></label>
+          <label class="dr2-radio-item" onclick="dr2SelectRadio(this,'dr2-reason')"><input type="radio" name="dr2-reason" value="환자의 거동이 현저히 곤란하고, 동일한 상병에 대하여 장기간 동일한 처방이 이루어지는 경우 (신체적 거동이 현저히 곤란한 경우, 정신질환으로 인한 증상으로 내원 불가한 경우 포함)"><span>② 환자의 거동이 현저히 곤란하고, 동일한 상병에 대하여 장기간 동일한 처방이 이루어지는 경우 (신체적 거동이 현저히 곤란한 경우, 정신질환으로 인한 증상으로 내원 불가한 경우 포함)</span></label>
+        </div>
+        <div class="err-msg" id="dr2-reason-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">사유를 선택해주세요.</div>
+      </div>
+
+      <!-- 서명 -->
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">11</span> 처방전 수령인 서명 (이름 정자)</label>
+        <div style="border:2px solid #d8d0c4;border-radius:12px;overflow:hidden;background:white">
+          <canvas id="dr2-sig-canvas" style="display:block;width:100%;touch-action:none;cursor:crosshair;height:160px"></canvas>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f5f3ef;border-top:1px solid #d8d0c4">
+            <span style="font-size:0.78rem;color:#888">손가락이나 펜으로 이름을 써주세요</span>
+            <button onclick="dr2ClearSig()" style="padding:6px 14px;background:white;border:1.5px solid #d8d0c4;border-radius:6px;font-size:0.8rem;cursor:pointer">지우기</button>
+          </div>
+        </div>
+        <div class="err-msg" id="dr2-sig-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">서명을 해주세요.</div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:32px">
+        <button onclick="dr2ResetForm()" style="padding:16px 22px;background:white;color:#888;border:1.5px solid #d8d0c4;border-radius:12px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer">초기화</button>
+        <button onclick="dr2Submit()" style="flex:1;padding:16px;background:#1a3a5c;color:white;border:none;border-radius:12px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(26,58,92,0.25)">📄 PDF 저장 + 시트 전송</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ══ 초진접수 탭 ══ -->
+  <div class="tab-content" id="tab-chojin">
+  <div style="max-width:680px;margin:0 auto;padding:16px 16px 60px">
+    <div style="display:inline-block;background:#1a3a5c;color:white;font-size:0.78rem;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:0.08em;margin-bottom:20px">초진 접수 양식</div>
+
+    <!-- 차트번호 -->
+    <div style="background:#fff8e8;border:2px dashed #c8a96e;border-radius:14px;padding:18px 20px;margin-bottom:24px">
+      <div style="font-size:0.78rem;font-weight:700;color:#a07830;letter-spacing:0.06em;margin-bottom:8px">🔒 접수 담당자 입력란</div>
+      <div id="cj2-chart-input-wrap">
+        <div style="margin-bottom:10px">
+          <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">0</span> 차트번호</label>
+          <input type="text" id="cj2-chart" placeholder="차트번호 입력" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+        </div>
+        <button onclick="cj2ProceedChart()" style="padding:11px 20px;background:#c8a96e;color:white;border:none;border-radius:8px;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:10px">확인 후 진행 ▶</button>
+      </div>
+      <div id="cj2-chart-locked" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#e8f4ea;border-radius:8px;border:1.5px solid #27ae60;margin-top:10px">
+          <span style="font-size:0.88rem;font-weight:600;color:#1e7e34" id="cj2-chart-display"></span>
+          <button onclick="cj2EditChart()" style="margin-left:auto;padding:4px 12px;background:white;border:1px solid #27ae60;border-radius:6px;font-size:0.78rem;color:#1e7e34;cursor:pointer">수정</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="cj2-form-body" style="display:none">
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">1</span> 성함</label>
+        <input type="text" id="cj2-name" placeholder="홍길동" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+        <div class="err-msg" id="cj2-name-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">성함을 입력해주세요.</div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">2</span> 주민번호 앞 6자리</label>
+        <input type="text" id="cj2-id1" placeholder="810101" maxlength="6" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+        <div class="err-msg" id="cj2-id1-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">6자리를 입력해주세요.</div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">3</span> 주민번호 뒤 7자리</label>
+        <input type="password" id="cj2-id2" placeholder="●●●●●●●" maxlength="7" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+        <div style="font-size:0.78rem;color:#888;margin-top:6px">입력 후 자동으로 가려집니다.</div>
+        <div class="err-msg" id="cj2-id2-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">7자리를 입력해주세요.</div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">4</span> 전화번호 <span style="font-size:0.78rem;color:#888;font-weight:400">(숫자만)</span></label>
+        <input type="tel" id="cj2-phone" placeholder="01012345678" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+        <div class="err-msg" id="cj2-phone-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">전화번호를 입력해주세요.</div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">5</span> 주소</label>
+        <input type="text" id="cj2-addr" placeholder="예) 서울시 강남구 역삼동" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+        <div style="font-size:0.78rem;color:#888;margin-top:6px">최소 도/시/동(읍·면)까지 기재해주세요.</div>
+        <div class="err-msg" id="cj2-addr-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">주소를 입력해주세요.</div>
+      </div>
+
+      <!-- 동의 항목들 -->
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">6</span> 개인정보 수집·이용 동의</label>
+        <div style="margin-bottom:10px;font-size:0.88rem;color:#555;line-height:1.6">귀하의 소중한 개인정보는 의료법 및 개인정보보호법의 관련규정에 의하여 진료 및 진료 지원의 목적으로 수집 및 이용됩니다. 개인정보 수집 및 이용에 동의하십니까?</div>
+        <label id="cj2-agree1-label" onclick="cj2ToggleAgree('cj2-agree1')" style="display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border:2px solid #d8d0c4;border-radius:14px;cursor:pointer;background:white;transition:all 0.18s;margin-bottom:14px">
+          <input type="checkbox" id="cj2-agree1" onclick="event.stopPropagation()" style="width:28px;height:28px;min-width:28px;accent-color:#27ae60;cursor:pointer;padding:0;margin-top:2px">
+          <div><div style="font-size:0.9rem;line-height:1.65">위 내용에 동의합니다.</div><div style="font-size:1rem;font-weight:700;color:#27ae60;margin-top:6px">✔ 예</div></div>
+        </label>
+        <div class="err-msg" id="cj2-agree1-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">동의가 필요합니다.</div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">7</span> 진단서 발급 관련 안내 동의</label>
+        <div style="margin-bottom:10px;font-size:0.88rem;color:#555;line-height:1.6">금일 진료 후 진단서 발급은 불가하며, 최소 1~2개월의 외래 진료 후 발급 가능함을 확인하고 동의하십니까?</div>
+        <label id="cj2-agree2-label" onclick="cj2ToggleAgree('cj2-agree2')" style="display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border:2px solid #d8d0c4;border-radius:14px;cursor:pointer;background:white;transition:all 0.18s;margin-bottom:14px">
+          <input type="checkbox" id="cj2-agree2" onclick="event.stopPropagation()" style="width:28px;height:28px;min-width:28px;accent-color:#27ae60;cursor:pointer;padding:0;margin-top:2px">
+          <div><div style="font-size:0.9rem;line-height:1.65">위 내용에 동의합니다.</div><div style="font-size:1rem;font-weight:700;color:#27ae60;margin-top:6px">✔ 예</div></div>
+        </label>
+        <div class="err-msg" id="cj2-agree2-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">동의가 필요합니다.</div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">8</span> 본인 확인 불가 시 진료 불가 동의</label>
+        <div style="margin-bottom:10px;font-size:0.88rem;color:#555;line-height:1.6">주민등록증, 자동차 운전면허증 등으로 본인 확인이 되지 않을 경우 진료가 불가함에 동의하십니까?</div>
+        <label id="cj2-agree3-label" onclick="cj2ToggleAgree('cj2-agree3')" style="display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border:2px solid #d8d0c4;border-radius:14px;cursor:pointer;background:white;transition:all 0.18s;margin-bottom:14px">
+          <input type="checkbox" id="cj2-agree3" onclick="event.stopPropagation()" style="width:28px;height:28px;min-width:28px;accent-color:#27ae60;cursor:pointer;padding:0;margin-top:2px">
+          <div><div style="font-size:0.9rem;line-height:1.65">위 내용에 동의합니다.</div><div style="font-size:1rem;font-weight:700;color:#27ae60;margin-top:6px">✔ 예</div></div>
+        </label>
+        <div class="err-msg" id="cj2-agree3-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">동의가 필요합니다.</div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">9</span> 발급 서류 환불 불가 동의</label>
+        <div style="margin-bottom:10px;font-size:0.88rem;color:#555;line-height:1.6">발급된 서류는 환불이 되지 않음을 이해하고 동의하십니까?</div>
+        <label id="cj2-agree4-label" onclick="cj2ToggleAgree('cj2-agree4')" style="display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border:2px solid #d8d0c4;border-radius:14px;cursor:pointer;background:white;transition:all 0.18s;margin-bottom:14px">
+          <input type="checkbox" id="cj2-agree4" onclick="event.stopPropagation()" style="width:28px;height:28px;min-width:28px;accent-color:#27ae60;cursor:pointer;padding:0;margin-top:2px">
+          <div><div style="font-size:0.9rem;line-height:1.65">위 내용에 동의합니다.</div><div style="font-size:1rem;font-weight:700;color:#27ae60;margin-top:6px">✔ 예</div></div>
+        </label>
+        <div class="err-msg" id="cj2-agree4-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">동의가 필요합니다.</div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">10</span> 상담료 및 검사비 발생 동의</label>
+        <div style="margin-bottom:10px;font-size:0.88rem;color:#555;line-height:1.6">약 처방이 없더라도 상담료 및 검사비 등이 있어 비용이 발생됨을 이해하고 동의하십니까?</div>
+        <label id="cj2-agree5-label" onclick="cj2ToggleAgree('cj2-agree5')" style="display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border:2px solid #d8d0c4;border-radius:14px;cursor:pointer;background:white;transition:all 0.18s;margin-bottom:14px">
+          <input type="checkbox" id="cj2-agree5" onclick="event.stopPropagation()" style="width:28px;height:28px;min-width:28px;accent-color:#27ae60;cursor:pointer;padding:0;margin-top:2px">
+          <div><div style="font-size:0.9rem;line-height:1.65">위 내용에 동의합니다.</div><div style="font-size:1rem;font-weight:700;color:#27ae60;margin-top:6px">✔ 예</div></div>
+        </label>
+        <div class="err-msg" id="cj2-agree5-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">동의가 필요합니다.</div>
+      </div>
+
+      <!-- 서명 -->
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">11</span> 이름 서명 (정자로 써주세요)</label>
+        <div style="border:2px solid #d8d0c4;border-radius:12px;overflow:hidden;background:white">
+          <canvas id="cj2-sig-canvas" style="display:block;width:100%;touch-action:none;cursor:crosshair;height:160px"></canvas>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f5f3ef;border-top:1px solid #d8d0c4">
+            <span style="font-size:0.78rem;color:#888">손가락이나 펜으로 이름을 써주세요</span>
+            <button onclick="cj2ClearSig()" style="padding:6px 14px;background:white;border:1.5px solid #d8d0c4;border-radius:6px;font-size:0.8rem;cursor:pointer">지우기</button>
+          </div>
+        </div>
+        <div class="err-msg" id="cj2-sig-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">서명을 해주세요.</div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:32px">
+        <button onclick="cj2ResetForm()" style="padding:16px 22px;background:white;color:#888;border:1.5px solid #d8d0c4;border-radius:12px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer">초기화</button>
+        <button onclick="cj2Submit()" style="flex:1;padding:16px;background:#1a3a5c;color:white;border:none;border-radius:12px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(26,58,92,0.25)">📄 PDF 저장 + 시트 전송</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
   <div class="tab-content" id="tab-clin">
     <div id="clin-lock" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;padding:2rem">
       <div style="font-size:36px">🔐</div>
@@ -887,6 +1142,8 @@ function switchSubTab(tab,el){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('act'));
   document.getElementById('tab-'+tab).classList.add('act');
   if(tab==='status')loadStatus();
+  if(tab==='daeri'){setTimeout(()=>{dr2InitCanvas();},100);}
+  if(tab==='chojin'){setTimeout(()=>{cj2InitCanvas();},100);}
   if(tab==='clin'){if(clinUnlocked){document.getElementById('clin-lock').style.display='none';document.getElementById('clin-body').style.display='block';}else{setTimeout(()=>document.getElementById('clin-pw')?.focus(),100);}}
 }
 
@@ -2622,7 +2879,221 @@ function showToast(msg) {
 // showPanel deferred to clinLogin
 
 
-// ═══ 임상가 척도 로직 ═══
+// ═══════════════════════════════════════
+// 대리처방 & 초진 통합 로직
+// ═══════════════════════════════════════
+const SHEET_WEB_APP_URL2 = "https://script.google.com/macros/s/AKfycbzFR4dqmK32DDSHf8s6D0IJzmOFJYakSyBFOCx5MXrcb-zA5XMs9Dk3cBKNkzBCzOc/exec";
+
+// ─ 라디오 아이템 스타일 주입 ─
+(function(){
+  const s = document.createElement('style');
+  s.textContent = `.dr2-radio-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;cursor:pointer;transition:all 0.18s;background:white;font-size:0.93rem;line-height:1.55;margin-bottom:0}.dr2-radio-item:hover{border-color:#2a5a8c;background:#f0f6ff}.dr2-radio-item.selected{border-color:#1a3a5c;background:#eef4fb}.dr2-radio-item input[type=radio]{width:20px;height:20px;min-width:20px;margin-top:1px;accent-color:#1a3a5c;cursor:pointer;padding:0}.cj2-agree-checked{border-color:#27ae60 !important;background:#f0fff6 !important}`;
+  document.head.appendChild(s);
+})();
+
+// ─ 유틸 ─
+function dr2Val(id){return document.getElementById(id)?.value.trim()||'';}
+function dr2Radio(name){const el=document.querySelector(`[name="${name}"]:checked`);return el?el.value:'';}
+function dr2ShowErr(id,show){const el=document.getElementById(id);if(el)el.style.display=show?'block':'none';}
+function dr2TodayStr(){const d=new Date();return String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');}
+function dr2FullDate(){return new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'});}
+
+// ─ 대리처방 캔버스 ─
+const dr2SigState={drawn:false};
+function dr2InitCanvas(){
+  const canvas=document.getElementById('dr2-sig-canvas');
+  if(!canvas||canvas._dr2init)return;
+  canvas._dr2init=true;
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth;
+  let drawing=false;
+  function getPos(e){const rect=canvas.getBoundingClientRect();const src=e.touches?e.touches[0]:e;return{x:src.clientX-rect.left,y:src.clientY-rect.top};}
+  function start(e){drawing=true;const p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();}
+  function draw(e){if(!drawing)return;e.preventDefault();const p=getPos(e);ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#1a3a5c';ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);dr2SigState.drawn=true;}
+  function end(){drawing=false;}
+  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseup',end);canvas.addEventListener('mouseleave',end);
+  canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',draw,{passive:false});canvas.addEventListener('touchend',end);
+}
+function dr2ClearSig(){const c=document.getElementById('dr2-sig-canvas');c.getContext('2d').clearRect(0,0,c.width,c.height);dr2SigState.drawn=false;}
+
+// ─ 대리처방 차트 ─
+function drProceedChart(){
+  const v=document.getElementById('dr-chart2').value.trim();
+  if(!v){toast('차트번호를 입력해주세요.');return;}
+  document.getElementById('dr-chart-input-wrap2').style.display='none';
+  document.getElementById('dr-chart-locked2').style.display='block';
+  document.getElementById('dr-chart-display2').textContent='차트번호 등록됨 ✅';
+  document.getElementById('dr-form-body2').style.display='block';
+  setTimeout(()=>dr2InitCanvas(),100);
+  toast('차트번호 확인. 이후 항목을 작성해주세요.');
+}
+function drEditChart(){
+  document.getElementById('dr-chart-input-wrap2').style.display='block';
+  document.getElementById('dr-chart-locked2').style.display='none';
+}
+
+// ─ 대리처방 라디오 ─
+function dr2SelectRadio(item,name){
+  document.querySelectorAll(`[name="${name}"]`).forEach(r=>{r.closest('.dr2-radio-item').classList.remove('selected');});
+  item.classList.add('selected');
+  item.querySelector('input[type="radio"]').checked=true;
+}
+
+// ─ 대리처방 PDF HTML ─
+function buildDr2PdfHtml(data,sigDataUrl){
+  const today=new Date().toLocaleDateString('ko-KR');
+  return `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${data.filename}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Noto+Serif+KR:wght@700&display=swap" rel="stylesheet"><style>body{font-family:'Noto Sans KR',sans-serif;max-width:720px;margin:30px auto;padding:0 20px;color:#111;font-size:14px}h1{text-align:center;font-family:'Noto Serif KR',serif;font-size:20px;letter-spacing:.12em;margin-bottom:20px}table{width:100%;border-collapse:collapse;margin-bottom:0}td{padding:9px 12px;border:1px solid #555;vertical-align:middle;line-height:1.5}.th{background:#f0f0f0;font-weight:700;text-align:center;width:90px}.th-big{background:#f0f0f0;font-weight:700;text-align:center;writing-mode:vertical-lr;width:44px;letter-spacing:.25em;font-size:13px;vertical-align:middle}.hl{background:#ffff00;font-weight:700}.reason-box{background:#ffff00;font-weight:700;padding:14px 16px;line-height:1.7}.law-text{margin:18px 0;font-size:13px;line-height:1.9;font-weight:700}.sig-table{width:100%;border-collapse:collapse;margin-top:18px}.sig-table td{border:1px solid #555;padding:12px 16px;vertical-align:middle}.sig-img{max-width:180px;max-height:70px;border:1px solid #ddd;border-radius:4px}.notice-box{margin-top:18px;border:2px solid #555}.notice-title{background:#555;color:white;text-align:center;padding:8px;font-weight:700;letter-spacing:.2em;font-size:14px}.notice-content{padding:12px 16px;font-size:12px;line-height:1.8}.notice-bold{font-weight:700;font-size:13px;color:#c00;text-align:center;display:block;margin-bottom:8px}.date-line{text-align:right;margin:10px 0 6px;font-size:13px}@media print{.no-print{display:none}body{margin:10px}}</style></head><body>
+<h1>처방전 대리수령 신청서</h1>
+<table>
+<tr><td class="th-big" rowspan="3">대리수령자</td><td class="th">성&nbsp;&nbsp;&nbsp;&nbsp;명</td><td class="hl">${data.visitorName}</td><td class="th">연&nbsp;&nbsp;락&nbsp;&nbsp;처</td><td class="hl">${data.visitorPhone}</td></tr>
+<tr><td class="th">생년월일</td><td class="hl">${data.visitorBirth}</td><td class="th">환자와의관계</td><td class="hl">${data.relation}</td></tr>
+<tr><td class="th">주&nbsp;&nbsp;&nbsp;&nbsp;소</td><td class="hl" colspan="3">${data.visitorAddr}</td></tr>
+<tr><td class="th-big" rowspan="3">환자</td><td class="th">성&nbsp;&nbsp;&nbsp;&nbsp;명</td><td class="hl">${data.patientName}</td><td class="th">연&nbsp;&nbsp;락&nbsp;&nbsp;처</td><td class="hl">${data.patientPhone}</td></tr>
+<tr><td class="th">생년월일</td><td class="hl" colspan="3">${data.patientBirth}</td></tr>
+<tr><td class="th">주&nbsp;&nbsp;&nbsp;&nbsp;소</td><td class="hl" colspan="3">${data.patientAddr}</td></tr>
+<tr><td class="th-big">대리수령사유</td><td colspan="4" class="reason-box">${data.reason}</td></tr>
+</table>
+<div class="law-text">의료법 제 17조의2제2항 및 같은 법 시행규칙 제11조의2제1항에 따라 위와 같이 처방전 대리 수령을 신청합니다.</div>
+<div class="date-line">${today}</div>
+<table class="sig-table">
+<tr><td style="width:120px;text-align:center;font-weight:700">환&nbsp;&nbsp;&nbsp;자</td><td></td><td style="text-align:center;color:#888;font-size:12px">(자필서명)</td><td style="width:50px"></td></tr>
+<tr><td style="text-align:center;font-weight:700">처방전 수령인</td><td class="hl" style="font-weight:700">${data.visitorName}</td><td style="text-align:center;color:#888;font-size:12px">(자필서명)</td><td style="text-align:center;padding:6px"><img src="${sigDataUrl}" class="sig-img" alt="서명"></td></tr>
+</table>
+<div class="notice-box"><div class="notice-title">유 의 사 항</div><div class="notice-content"><span class="notice-bold">※ 대리처방 여부는 의학적 판단에 따른 의료인 재량으로 불가 할 수 있습니다.</span>1. 환자 또는 대리수령자가 아닌 사람이 처방전을 수령하는 동 「의료법」 제17조의2제2항을 위반하여 처방전을 수령하는 경우 같은 법 제90조에 따라 500만원 이하의 벌금에 처해질 수 있습니다.<br><br>2. 신청인은 다음 각 목의 서류를 함께 제시해야 합니다.<br>가. 대리수령자의 신분증 또는 그 사본<br>나. 환자와의 관계를 증명할 수 있는 다음의 구분에 따른 서류<br>1) 환자의 직계존속·비속, 직계비속의 배우자, 배우자, 배우자의 직계존속, 형제자매: 가족관계증명서, 주민등록표 동본 등 친족관계임을 확인할 수 있는 서류<br>2) 「노인복지법」 제34조에 따른 노인의료복지시설에서 근무하는 사람: 노인의료복지시설에서 발급한 재직증명서<br>3) 「장애인복지법」 제58조에 따른 장애인 거주시설에서 근무하는 사람: 장애인 거주시설에서 발급한 재직증명서<br>다. 환자의 신분증 또는 그 사본. 다만, 「주민등록법」 제24조제1항에 따른 주민등록증이 발급되지 않은 만 17세 미만의 환자는 제외합니다.</div></div>
+<br><button class="no-print" onclick="window.print()" style="padding:12px 28px;background:#1a3a5c;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:10px">🖨️ 인쇄 / PDF 저장</button>
+</body></html>`;
+}
+
+// ─ 대리처방 제출 ─
+async function dr2Submit(){
+  let valid=true;
+  const vn=dr2Val('dr2-visitor-name');dr2ShowErr('dr2-visitor-name-err',!vn);if(!vn)valid=false;
+  const vp=dr2Val('dr2-visitor-phone');dr2ShowErr('dr2-visitor-phone-err',!vp);if(!vp)valid=false;
+  const vb=dr2Val('dr2-visitor-birth');dr2ShowErr('dr2-visitor-birth-err',vb.length!==8);if(vb.length!==8)valid=false;
+  const va=dr2Val('dr2-visitor-addr');dr2ShowErr('dr2-visitor-addr-err',!va);if(!va)valid=false;
+  const rel=dr2Radio('dr2-relation');dr2ShowErr('dr2-relation-err',!rel);if(!rel)valid=false;
+  const pn=dr2Val('dr2-patient-name');dr2ShowErr('dr2-patient-name-err',!pn);if(!pn)valid=false;
+  const pp=dr2Val('dr2-patient-phone');dr2ShowErr('dr2-patient-phone-err',!pp);if(!pp)valid=false;
+  const pb=dr2Val('dr2-patient-birth');dr2ShowErr('dr2-patient-birth-err',pb.length!==8);if(pb.length!==8)valid=false;
+  const pa=dr2Val('dr2-patient-addr');dr2ShowErr('dr2-patient-addr-err',!pa);if(!pa)valid=false;
+  const rsn=dr2Radio('dr2-reason');dr2ShowErr('dr2-reason-err',!rsn);if(!rsn)valid=false;
+  dr2ShowErr('dr2-sig-err',!dr2SigState.drawn);if(!dr2SigState.drawn)valid=false;
+  if(!valid){toast('⚠️ 누락된 항목을 확인해주세요.');return;}
+  const chart=document.getElementById('dr-chart2').value.trim();
+  const dateStr=dr2TodayStr();
+  const filename=chart+vn+pn+'대리수령'+dateStr;
+  const sigDataUrl=document.getElementById('dr2-sig-canvas').toDataURL('image/png');
+  const data={chart,visitorName:vn,visitorPhone:vp,visitorBirth:vb,visitorAddr:va,relation:rel,patientName:pn,patientPhone:pp,patientBirth:pb,patientAddr:pa,reason:rsn,filename};
+  const win=window.open('','_blank');
+  if(!win){toast('팝업 차단을 해제해주세요.');return;}
+  win.document.write(buildDr2PdfHtml(data,sigDataUrl));
+  win.document.close();
+  try{
+    await fetch(SHEET_WEB_APP_URL2,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'대리',row:[dr2FullDate(),chart,vn,vp,vb,va,rel,pn,pp,pb,pa,rsn,'(드라이브링크)',filename],signature:sigDataUrl})});
+    toast('✅ PDF 저장 + 시트 전송 완료!');
+  }catch(e){toast('📄 PDF 창 열림');}
+}
+
+function dr2ResetForm(){
+  if(!confirm('모든 입력 내용을 초기화할까요?'))return;
+  ['dr2-visitor-name','dr2-visitor-phone','dr2-visitor-birth','dr2-visitor-addr','dr2-patient-name','dr2-patient-phone','dr2-patient-birth','dr2-patient-addr'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('[name="dr2-relation"],[name="dr2-reason"]').forEach(r=>{r.checked=false;r.closest('.dr2-radio-item')?.classList.remove('selected');});
+  dr2ClearSig();drEditChart();document.getElementById('dr-chart2').value='';
+  document.getElementById('dr-form-body2').style.display='none';
+  toast('초기화 완료');
+}
+
+// ─ 초진접수 캔버스 ─
+const cj2SigState={drawn:false};
+function cj2InitCanvas(){
+  const canvas=document.getElementById('cj2-sig-canvas');
+  if(!canvas||canvas._cj2init)return;
+  canvas._cj2init=true;
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth;
+  let drawing=false;
+  function getPos(e){const rect=canvas.getBoundingClientRect();const src=e.touches?e.touches[0]:e;return{x:src.clientX-rect.left,y:src.clientY-rect.top};}
+  function start(e){drawing=true;const p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();}
+  function draw(e){if(!drawing)return;e.preventDefault();const p=getPos(e);ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#1a3a5c';ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);cj2SigState.drawn=true;}
+  function end(){drawing=false;}
+  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseup',end);canvas.addEventListener('mouseleave',end);
+  canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',draw,{passive:false});canvas.addEventListener('touchend',end);
+}
+function cj2ClearSig(){const c=document.getElementById('cj2-sig-canvas');c.getContext('2d').clearRect(0,0,c.width,c.height);cj2SigState.drawn=false;}
+
+// ─ 초진 차트 ─
+function cj2ProceedChart(){
+  const v=document.getElementById('cj2-chart').value.trim();
+  if(!v){toast('차트번호를 입력해주세요.');return;}
+  document.getElementById('cj2-chart-input-wrap').style.display='none';
+  document.getElementById('cj2-chart-locked').style.display='block';
+  document.getElementById('cj2-chart-display').textContent='차트번호 등록됨 ✅';
+  document.getElementById('cj2-form-body').style.display='block';
+  setTimeout(()=>cj2InitCanvas(),100);
+  toast('차트번호 확인. 이후 항목을 작성해주세요.');
+}
+function cj2EditChart(){
+  document.getElementById('cj2-chart-input-wrap').style.display='block';
+  document.getElementById('cj2-chart-locked').style.display='none';
+}
+
+// ─ 초진 동의 ─
+function cj2ToggleAgree(id){
+  const cb=document.getElementById(id);
+  cb.checked=!cb.checked;
+  const lbl=document.getElementById(id+'-label');
+  if(lbl){lbl.style.borderColor=cb.checked?'#27ae60':'#d8d0c4';lbl.style.background=cb.checked?'#f0fff6':'white';}
+}
+
+// ─ 초진 제출 ─
+async function cj2Submit(){
+  let valid=true;
+  const n=document.getElementById('cj2-name').value.trim();dr2ShowErr('cj2-name-err',!n);if(!n)valid=false;
+  const i1=document.getElementById('cj2-id1').value.trim();dr2ShowErr('cj2-id1-err',i1.length!==6);if(i1.length!==6)valid=false;
+  const i2=document.getElementById('cj2-id2').value.trim();dr2ShowErr('cj2-id2-err',i2.length!==7);if(i2.length!==7)valid=false;
+  const ph=document.getElementById('cj2-phone').value.trim();dr2ShowErr('cj2-phone-err',!ph);if(!ph)valid=false;
+  const ad=document.getElementById('cj2-addr').value.trim();dr2ShowErr('cj2-addr-err',!ad);if(!ad)valid=false;
+  const a1=document.getElementById('cj2-agree1').checked;const a2=document.getElementById('cj2-agree2').checked;
+  const a3=document.getElementById('cj2-agree3').checked;const a4=document.getElementById('cj2-agree4').checked;const a5=document.getElementById('cj2-agree5').checked;
+  dr2ShowErr('cj2-agree1-err',!a1);dr2ShowErr('cj2-agree2-err',!a2);dr2ShowErr('cj2-agree3-err',!a3);dr2ShowErr('cj2-agree4-err',!a4);dr2ShowErr('cj2-agree5-err',!a5);
+  if(!a1||!a2||!a3||!a4||!a5)valid=false;
+  dr2ShowErr('cj2-sig-err',!cj2SigState.drawn);if(!cj2SigState.drawn)valid=false;
+  if(!valid){toast('⚠️ 누락된 항목을 확인해주세요.');return;}
+  const chart=document.getElementById('cj2-chart').value.trim();
+  const dateStr=dr2TodayStr();
+  const filename=`${chart}초진접수${dateStr}`;
+  const sigDataUrl=document.getElementById('cj2-sig-canvas').toDataURL('image/png');
+  const today=new Date().toLocaleDateString('ko-KR');
+  const pdfHtml=`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${filename}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Noto+Serif+KR:wght@700&display=swap" rel="stylesheet"><style>@page{size:A4 portrait;margin:10mm 12mm 8mm}html,body{margin:0;padding:0}body{font-family:'Noto Sans KR',sans-serif;color:#222;font-size:11.5px}h2{text-align:center;color:#1a3a5c;font-family:'Noto Serif KR',serif;font-size:15px;margin:0 0 2px}.sub{text-align:center;color:#888;font-size:10px;margin-bottom:8px}table{width:100%;border-collapse:collapse;margin-top:6px}td{padding:5px 8px;border:1px solid #ccc;font-size:11px;line-height:1.45}td:first-child{background:#f0f3f8;font-weight:600;color:#1a3a5c;white-space:nowrap}.info-table td:first-child{width:28%}.agree-table td:first-child{width:30%}h3{color:#1a3a5c;margin:7px 0 2px;font-size:12px;border-top:1px solid #ccc;padding-top:5px}.sig-section{margin-top:6px;display:flex;align-items:center;gap:14px;border-top:1.5px solid #1a3a5c;padding-top:5px}.sig-label{font-size:10px;color:#888;white-space:nowrap}.sig-img{height:44px;max-width:220px;border:1px solid #ddd;border-radius:4px}.footer{margin-top:4px;font-size:9.5px;color:#bbb;text-align:right}@media print{.no-print{display:none}}@media screen{body{max-width:680px;margin:20px auto;padding:0 16px}}</style></head><body>
+<h2>초진 접수 동의서</h2><p class="sub">작성일: ${today}</p>
+<table class="info-table"><tr><td>차트번호</td><td>${chart}</td><td>성명</td><td>${n}</td></tr><tr><td>주민번호 앞 6자리</td><td>${i1}</td><td>주민번호 뒤 7자리</td><td>*******</td></tr><tr><td>전화번호</td><td>${ph}</td><td>주소</td><td>${ad}</td></tr></table>
+<h3>동의 항목</h3>
+<table class="agree-table"><tr><td>6. 개인정보 수집·이용 동의</td><td>귀하의 소중한 개인정보는 의료법 및 개인정보보호법의 관련규정에 의하여 진료 및 진료 지원의 목적으로 수집 및 이용됩니다.<br><strong style="color:${a1?'#27ae60':'#c0392b'}">${a1?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>7. 진단서 발급 관련 동의</td><td>금일 진료 후 진단서 발급 불가하며, 최소 1~2개월의 외래 진료 후 발급 가능함을 확인합니다.<br><strong style="color:${a2?'#27ae60':'#c0392b'}">${a2?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>8. 본인 확인 불가 시 진료 불가 동의</td><td>주민등록증, 운전면허증 등으로 본인 확인이 되지 않을 경우 진료 불가함에 동의합니다.<br><strong style="color:${a3?'#27ae60':'#c0392b'}">${a3?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>9. 발급 서류 환불 불가 동의</td><td>발급된 서류는 환불이 되지 않음을 이해하고 동의합니다.<br><strong style="color:${a4?'#27ae60':'#c0392b'}">${a4?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>10. 상담료·검사비 발생 동의</td><td>약 처방이 없더라도 상담료 및 검사비 등이 발생됨을 이해하고 동의합니다.<br><strong style="color:${a5?'#27ae60':'#c0392b'}">${a5?'✔ 동의':'✘ 미동의'}</strong></td></tr></table>
+<div class="sig-section"><span class="sig-label">서명 (이름 정자)</span><img src="${sigDataUrl}" class="sig-img" alt="서명"><span class="footer" style="margin-left:auto">${filename} | ${today}</span></div>
+<button class="no-print" onclick="window.print()" style="margin-top:14px;padding:12px 28px;background:#1a3a5c;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">🖨️ 인쇄 / PDF 저장</button>
+</body></html>`;
+  const win=window.open('','_blank');
+  if(!win){toast('팝업 차단을 해제해주세요.');return;}
+  win.document.write(pdfHtml);win.document.close();
+  try{
+    await fetch(SHEET_WEB_APP_URL2,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'초진',row:[dr2FullDate(),chart,n,i1,i2,ph,ad,a1?'동의':'미동의',a2?'동의':'미동의',a3?'동의':'미동의',a4?'동의':'미동의',a5?'동의':'미동의','(드라이브링크)',filename],signature:sigDataUrl})});
+    toast('✅ PDF 저장 + 시트 전송 완료!');
+  }catch(e){toast('📄 PDF 저장 완료');}
+}
+
+function cj2ResetForm(){
+  if(!confirm('모든 입력 내용을 초기화할까요?'))return;
+  ['cj2-name','cj2-id1','cj2-id2','cj2-phone','cj2-addr'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['cj2-agree1','cj2-agree2','cj2-agree3','cj2-agree4','cj2-agree5'].forEach(id=>{
+    const cb=document.getElementById(id);if(cb)cb.checked=false;
+    const lbl=document.getElementById(id+'-label');if(lbl){lbl.style.borderColor='#d8d0c4';lbl.style.background='white';}
+  });
+  cj2ClearSig();cj2EditChart();document.getElementById('cj2-chart').value='';
+  document.getElementById('cj2-form-body').style.display='none';
+  toast('초기화 완료');
+}
+
+
 let clinUnlocked = false;
 
 function clinLogin(){
