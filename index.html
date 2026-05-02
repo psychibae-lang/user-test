@@ -1142,8 +1142,8 @@ function switchSubTab(tab,el){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('act'));
   document.getElementById('tab-'+tab).classList.add('act');
   if(tab==='status')loadStatus();
-  if(tab==='daeri'){setTimeout(()=>{dr2InitCanvas();},100);}
-  if(tab==='chojin'){setTimeout(()=>{cj2InitCanvas();},100);}
+  if(tab==='daeri'){setTimeout(()=>{dr2InitCanvas();},200);}
+  if(tab==='chojin'){setTimeout(()=>{cj2InitCanvas();},200);}
   if(tab==='clin'){if(clinUnlocked){document.getElementById('clin-lock').style.display='none';document.getElementById('clin-body').style.display='block';}else{setTimeout(()=>document.getElementById('clin-pw')?.focus(),100);}}
 }
 
@@ -2898,23 +2898,72 @@ function dr2ShowErr(id,show){const el=document.getElementById(id);if(el)el.style
 function dr2TodayStr(){const d=new Date();return String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');}
 function dr2FullDate(){return new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'});}
 
-// ─ 대리처방 캔버스 ─
+// ─ 범용 캔버스 서명 초기화 ─
 const dr2SigState={drawn:false};
-function dr2InitCanvas(){
-  const canvas=document.getElementById('dr2-sig-canvas');
-  if(!canvas||canvas._dr2init)return;
-  canvas._dr2init=true;
-  const ctx=canvas.getContext('2d');
-  canvas.width=canvas.offsetWidth;
-  let drawing=false;
-  function getPos(e){const rect=canvas.getBoundingClientRect();const src=e.touches?e.touches[0]:e;return{x:src.clientX-rect.left,y:src.clientY-rect.top};}
-  function start(e){drawing=true;const p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();}
-  function draw(e){if(!drawing)return;e.preventDefault();const p=getPos(e);ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#1a3a5c';ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);dr2SigState.drawn=true;}
+const cj2SigStateInner={drawn:false};
+
+function makeSignatureCanvas(canvasId, stateObj, color){
+  color = color||'#1a3a5c';
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+
+  // 이벤트 리스너 중복 방지: 기존 리스너 제거를 위해 clone
+  const fresh = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(fresh, canvas);
+  const c = document.getElementById(canvasId);
+  const ctx = c.getContext('2d');
+
+  // 실제 표시 너비로 캔버스 픽셀 크기 설정
+  function setSize(){
+    const w = c.getBoundingClientRect().width || c.parentElement.getBoundingClientRect().width || 640;
+    if(w > 0 && c.width !== Math.round(w)){
+      c.width = Math.round(w);
+      c.height = 160;
+    }
+  }
+  setSize();
+
+  let drawing = false;
+  function getPos(e){
+    const rect = c.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    // 실제 픽셀 좌표 → 캔버스 좌표 (DPR 대응)
+    const scaleX = c.width / rect.width;
+    const scaleY = c.height / rect.height;
+    return {x:(src.clientX - rect.left)*scaleX, y:(src.clientY - rect.top)*scaleY};
+  }
+  function start(e){
+    setSize();
+    drawing=true;
+    const p=getPos(e);
+    ctx.beginPath();ctx.moveTo(p.x,p.y);
+    e.preventDefault();
+  }
+  function draw(e){
+    if(!drawing)return;
+    e.preventDefault();
+    const p=getPos(e);
+    ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=color;
+    ctx.lineTo(p.x,p.y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(p.x,p.y);
+    stateObj.drawn=true;
+  }
   function end(){drawing=false;}
-  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseup',end);canvas.addEventListener('mouseleave',end);
-  canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',draw,{passive:false});canvas.addEventListener('touchend',end);
+  c.addEventListener('mousedown',start);
+  c.addEventListener('mousemove',draw);
+  c.addEventListener('mouseup',end);
+  c.addEventListener('mouseleave',end);
+  c.addEventListener('touchstart',start,{passive:false});
+  c.addEventListener('touchmove',draw,{passive:false});
+  c.addEventListener('touchend',end);
 }
-function dr2ClearSig(){const c=document.getElementById('dr2-sig-canvas');c.getContext('2d').clearRect(0,0,c.width,c.height);dr2SigState.drawn=false;}
+
+function dr2InitCanvas(){makeSignatureCanvas('dr2-sig-canvas', dr2SigState);}
+function dr2ClearSig(){
+  const c=document.getElementById('dr2-sig-canvas');
+  if(c){c.getContext('2d').clearRect(0,0,c.width,c.height);}
+  dr2SigState.drawn=false;
+}
 
 // ─ 대리처방 차트 ─
 function drProceedChart(){
@@ -2924,7 +2973,7 @@ function drProceedChart(){
   document.getElementById('dr-chart-locked2').style.display='block';
   document.getElementById('dr-chart-display2').textContent='차트번호 등록됨 ✅';
   document.getElementById('dr-form-body2').style.display='block';
-  setTimeout(()=>dr2InitCanvas(),100);
+  setTimeout(()=>dr2InitCanvas(),200);
   toast('차트번호 확인. 이후 항목을 작성해주세요.');
 }
 function drEditChart(){
@@ -3004,22 +3053,13 @@ function dr2ResetForm(){
 }
 
 // ─ 초진접수 캔버스 ─
-const cj2SigState={drawn:false};
-function cj2InitCanvas(){
-  const canvas=document.getElementById('cj2-sig-canvas');
-  if(!canvas||canvas._cj2init)return;
-  canvas._cj2init=true;
-  const ctx=canvas.getContext('2d');
-  canvas.width=canvas.offsetWidth;
-  let drawing=false;
-  function getPos(e){const rect=canvas.getBoundingClientRect();const src=e.touches?e.touches[0]:e;return{x:src.clientX-rect.left,y:src.clientY-rect.top};}
-  function start(e){drawing=true;const p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();}
-  function draw(e){if(!drawing)return;e.preventDefault();const p=getPos(e);ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#1a3a5c';ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);cj2SigState.drawn=true;}
-  function end(){drawing=false;}
-  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',draw);canvas.addEventListener('mouseup',end);canvas.addEventListener('mouseleave',end);
-  canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',draw,{passive:false});canvas.addEventListener('touchend',end);
+const cj2SigState = cj2SigStateInner;
+function cj2InitCanvas(){makeSignatureCanvas('cj2-sig-canvas', cj2SigState);}
+function cj2ClearSig(){
+  const c=document.getElementById('cj2-sig-canvas');
+  if(c){c.getContext('2d').clearRect(0,0,c.width,c.height);}
+  cj2SigState.drawn=false;
 }
-function cj2ClearSig(){const c=document.getElementById('cj2-sig-canvas');c.getContext('2d').clearRect(0,0,c.width,c.height);cj2SigState.drawn=false;}
 
 // ─ 초진 차트 ─
 function cj2ProceedChart(){
@@ -3029,7 +3069,7 @@ function cj2ProceedChart(){
   document.getElementById('cj2-chart-locked').style.display='block';
   document.getElementById('cj2-chart-display').textContent='차트번호 등록됨 ✅';
   document.getElementById('cj2-form-body').style.display='block';
-  setTimeout(()=>cj2InitCanvas(),100);
+  setTimeout(()=>cj2InitCanvas(),200);
   toast('차트번호 확인. 이후 항목을 작성해주세요.');
 }
 function cj2EditChart(){
