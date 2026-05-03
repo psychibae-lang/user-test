@@ -568,15 +568,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </style>
 </head>
 <body>
+
+<!-- ══ 잠금 화면 ══ -->
+<div id="lock-screen" style="position:fixed;inset:0;background:#1a3a5c;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;">
+  <div style="color:white;font-size:1.5rem;font-weight:700;letter-spacing:0.04em;text-align:center;">🏥 원무 관리 시스템</div>
+  <div style="background:white;border-radius:16px;padding:32px 28px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+    <div style="font-size:0.95rem;font-weight:600;color:#1a3a5c;margin-bottom:12px;text-align:center;">🔒 비밀번호를 입력하세요</div>
+    <input type="password" id="lock-pw-input" placeholder="비밀번호"
+      style="width:100%;padding:14px;border:1.5px solid #d1d5db;border-radius:10px;font-size:1.1rem;text-align:center;margin-bottom:14px;"
+      onkeydown="if(event.key==='Enter') unlockApp()">
+    <div id="lock-err" style="color:#c0392b;font-size:0.82rem;text-align:center;margin-bottom:8px;display:none;">비밀번호가 틀렸습니다.</div>
+    <button onclick="unlockApp()"
+      style="width:100%;background:#1a3a5c;color:white;border:none;border-radius:10px;padding:14px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">
+      확인
+    </button>
+  </div>
+</div>
+
 <div class="app">
 
 <div class="screen active" id="s-admin">
   <div class="hdr">정신건강 검사 관리 (일반용)</div>
-  <div class="sub-hdr" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr">
+  <div class="sub-hdr" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr">
     <span class="act" onclick="switchSubTab('issue',this)">검사 선택</span>
     <span onclick="switchSubTab('status',this)">완료 현황</span>
     <span onclick="switchSubTab('daeri',this)">대리 처방</span>
     <span onclick="switchSubTab('chojin',this)">초진 접수</span>
+    <span onclick="switchSubTab('search',this)">접수 조회</span>
     <span onclick="switchSubTab('clin',this)">임상가 척도</span>
   </div>
   <div class="tab-content act" id="tab-issue">
@@ -783,7 +801,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
       <div style="margin-bottom:20px">
         <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">3</span> 주민번호 뒤 7자리</label>
-        <input type="password" id="cj2-id2" placeholder="●●●●●●●" maxlength="7" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
+        <input type="password" id="cj2-id2" placeholder="1234567" maxlength="7" inputmode="numeric" style="width:100%;padding:14px 16px;border:1.5px solid #d8d0c4;border-radius:10px;font-size:1.05rem;background:white">
         <div style="font-size:0.78rem;color:#888;margin-top:6px">입력 후 자동으로 가려집니다.</div>
         <div class="err-msg" id="cj2-id2-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">7자리를 입력해주세요.</div>
       </div>
@@ -852,9 +870,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div class="err-msg" id="cj2-agree5-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">동의가 필요합니다.</div>
       </div>
 
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">11</span> CCTV 촬영 안내 확인</label>
+        <div style="margin-bottom:10px;font-size:0.88rem;color:#555;line-height:1.6">본 병원은 24시간 CCTV 촬영 중임을 알려드립니다.</div>
+        <label id="cj2-agree6-label" onclick="cj2ToggleAgree('cj2-agree6')" style="display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border:2px solid #d8d0c4;border-radius:14px;cursor:pointer;background:white;transition:all 0.18s;margin-bottom:14px">
+          <input type="checkbox" id="cj2-agree6" onclick="event.stopPropagation()" style="width:28px;height:28px;min-width:28px;accent-color:#27ae60;cursor:pointer;padding:0;margin-top:2px">
+          <div><div style="font-size:0.9rem;line-height:1.65">위 내용을 확인하였습니다.</div><div style="font-size:1rem;font-weight:700;color:#27ae60;margin-top:6px">✔ 예</div></div>
+        </label>
+        <div class="err-msg" id="cj2-agree6-err" style="font-size:0.78rem;color:#c0392b;margin-top:5px;display:none">확인이 필요합니다.</div>
+      </div>
+
       <!-- 서명 -->
       <div style="margin-bottom:20px">
-        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">11</span> 이름 서명 (정자로 써주세요)</label>
+        <label style="font-size:0.88rem;font-weight:600;color:#1a3a5c;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:#1a3a5c;color:white;border-radius:50%;font-size:0.75rem;font-weight:700">12</span> 이름 서명 (정자로 써주세요)</label>
         <div style="border:2px solid #d8d0c4;border-radius:12px;overflow:hidden;background:white">
           <canvas id="cj2-sig-canvas" style="display:block;width:100%;touch-action:none;cursor:crosshair;height:160px"></canvas>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f5f3ef;border-top:1px solid #d8d0c4">
@@ -867,10 +895,103 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
       <div style="display:flex;gap:12px;margin-top:32px">
         <button onclick="cj2ResetForm()" style="padding:16px 22px;background:white;color:#888;border:1.5px solid #d8d0c4;border-radius:12px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer">초기화</button>
-        <button onclick="cj2Submit()" style="flex:1;padding:16px;background:#1a3a5c;color:white;border:none;border-radius:12px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(26,58,92,0.25)">📄 PDF 저장 + 시트 전송</button>
+        <button onclick="cj2Submit()" style="flex:1;padding:16px;background:#1a3a5c;color:white;border:none;border-radius:12px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(26,58,92,0.25)">✅ 완료 후 이곳을 눌러주세요</button>
       </div>
     </div>
   </div>
+  </div>
+
+  <!-- ══ 접수 조회 탭 ══ -->
+  <div class="tab-content" id="tab-search">
+  <div style="max-width:680px;margin:0 auto;padding:16px">
+
+    <!-- 검색 바 -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <select id="search-type" style="padding:9px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;background:white;">
+          <option value="all">전체</option>
+          <option value="chojin">초진</option>
+          <option value="daeri">대리</option>
+        </select>
+        <input type="text" id="search-chart" placeholder="차트번호" style="padding:9px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;width:110px;">
+        <input type="text" id="search-name" placeholder="이름" style="padding:9px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;width:100px;">
+        <button onclick="doSearch()" style="padding:9px 18px;background:#1a3a5c;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🔍 조회</button>
+      </div>
+    </div>
+
+    <div id="search-results" style="font-size:13px;color:#9ca3af;text-align:center;padding:20px;">조회 버튼을 눌러주세요.</div>
+  </div>
+  </div>
+
+  <!-- 상세 조회 모달 -->
+  <div id="detail-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9000;overflow-y:auto;">
+    <div style="background:#fff;max-width:480px;margin:60px auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+      <div style="background:#1a3a5c;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <span id="modal-title" style="font-size:17px;font-weight:bold;"></span>
+        <button onclick="closeModal()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>
+      </div>
+      <div id="modal-body" style="padding:16px 20px;overflow-y:auto;max-height:65vh;"></div>
+      <div style="padding:12px 20px;border-top:1px solid #eee;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+        <button onclick="openDeleteModal()" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer;font-weight:bold;margin-right:auto;">🗑️ 삭제</button>
+        <button onclick="openEditModal()" style="background:#d97706;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer;font-weight:bold;">✏️ 수정</button>
+        <button onclick="printModalPDF()" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer;font-weight:bold;">🖨️ PDF</button>
+        <button onclick="closeModal()" style="background:#6b7280;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer;">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 수정 모달 -->
+  <div id="edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9100;overflow-y:auto;">
+    <div style="background:#fff;max-width:400px;margin:80px auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+      <div style="background:#d97706;color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:16px;font-weight:bold;">✏️ 데이터 수정</span>
+        <button onclick="closeEditModal()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>
+      </div>
+      <div style="padding:18px 20px;">
+        <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px;margin-bottom:14px;font-size:12px;color:#856404;">
+          ⚠️ 잘못 입력된 이름 또는 차트번호만 수정할 수 있습니다.
+        </div>
+        <div id="edit-pw-section">
+          <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">🔒 관리자 비밀번호</label>
+          <input type="password" id="edit-pw-input" placeholder="비밀번호 입력"
+            style="width:100%;padding:11px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;margin-bottom:10px;"
+            onkeydown="if(event.key==='Enter') verifyEditPw()">
+          <button onclick="verifyEditPw()" style="width:100%;background:#1a3a5c;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;">확인</button>
+        </div>
+        <div id="edit-fields-section" style="display:none;">
+          <div style="margin-bottom:12px;">
+            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px;">이름 <span id="edit-name-label" style="color:#9ca3af;font-weight:400;"></span></label>
+            <input type="text" id="edit-name-input" style="width:100%;padding:11px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;">
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px;">차트번호 <span id="edit-chart-label" style="color:#9ca3af;font-weight:400;"></span></label>
+            <input type="text" id="edit-chart-input" inputmode="numeric" style="width:100%;padding:11px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;">
+          </div>
+          <button onclick="saveEdit()" style="width:100%;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;">💾 저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 삭제 모달 -->
+  <div id="delete-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9200;overflow-y:auto;">
+    <div style="background:#fff;max-width:380px;margin:100px auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.35);">
+      <div style="background:#dc2626;color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:16px;font-weight:bold;">🗑️ 데이터 삭제</span>
+        <button onclick="closeDeleteModal()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>
+      </div>
+      <div style="padding:18px 20px;">
+        <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px;color:#991b1b;line-height:1.6;">
+          ⚠️ <strong>삭제된 데이터는 복구할 수 없습니다.</strong>
+        </div>
+        <div id="delete-target-info" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px;font-size:12px;color:#374151;margin-bottom:12px;font-weight:600;"></div>
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">🔒 관리자 비밀번호</label>
+        <input type="password" id="delete-pw-input" placeholder="비밀번호 입력"
+          style="width:100%;padding:11px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;margin-bottom:10px;"
+          onkeydown="if(event.key==='Enter') confirmDelete()">
+        <button onclick="confirmDelete()" style="width:100%;background:#dc2626;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">🗑️ 삭제 확인</button>
+      </div>
+    </div>
   </div>
 
   <div class="tab-content" id="tab-clin">
@@ -1144,6 +1265,7 @@ function switchSubTab(tab,el){
   if(tab==='status')loadStatus();
   if(tab==='daeri'){setTimeout(()=>{dr2InitCanvas();},200);}
   if(tab==='chojin'){setTimeout(()=>{cj2InitCanvas();},200);}
+  if(tab==='search'){loadSearchTab();}
   if(tab==='clin'){if(clinUnlocked){document.getElementById('clin-lock').style.display='none';document.getElementById('clin-body').style.display='block';}else{setTimeout(()=>document.getElementById('clin-pw')?.focus(),100);}}
 }
 
@@ -3094,9 +3216,9 @@ async function cj2Submit(){
   const ph=document.getElementById('cj2-phone').value.trim();dr2ShowErr('cj2-phone-err',!ph);if(!ph)valid=false;
   const ad=document.getElementById('cj2-addr').value.trim();dr2ShowErr('cj2-addr-err',!ad);if(!ad)valid=false;
   const a1=document.getElementById('cj2-agree1').checked;const a2=document.getElementById('cj2-agree2').checked;
-  const a3=document.getElementById('cj2-agree3').checked;const a4=document.getElementById('cj2-agree4').checked;const a5=document.getElementById('cj2-agree5').checked;
-  dr2ShowErr('cj2-agree1-err',!a1);dr2ShowErr('cj2-agree2-err',!a2);dr2ShowErr('cj2-agree3-err',!a3);dr2ShowErr('cj2-agree4-err',!a4);dr2ShowErr('cj2-agree5-err',!a5);
-  if(!a1||!a2||!a3||!a4||!a5)valid=false;
+  const a3=document.getElementById('cj2-agree3').checked;const a4=document.getElementById('cj2-agree4').checked;const a5=document.getElementById('cj2-agree5').checked;const a6=document.getElementById('cj2-agree6').checked;
+  dr2ShowErr('cj2-agree1-err',!a1);dr2ShowErr('cj2-agree2-err',!a2);dr2ShowErr('cj2-agree3-err',!a3);dr2ShowErr('cj2-agree4-err',!a4);dr2ShowErr('cj2-agree5-err',!a5);dr2ShowErr('cj2-agree6-err',!a6);
+  if(!a1||!a2||!a3||!a4||!a5||!a6)valid=false;
   dr2ShowErr('cj2-sig-err',!cj2SigState.drawn);if(!cj2SigState.drawn)valid=false;
   if(!valid){toast('⚠️ 누락된 항목을 확인해주세요.');return;}
   const chart=document.getElementById('cj2-chart').value.trim();
@@ -3108,7 +3230,7 @@ async function cj2Submit(){
 <h2>초진 접수 동의서</h2><p class="sub">작성일: ${today}</p>
 <table class="info-table"><tr><td>차트번호</td><td>${chart}</td><td>성명</td><td>${n}</td></tr><tr><td>주민번호 앞 6자리</td><td>${i1}</td><td>주민번호 뒤 7자리</td><td>*******</td></tr><tr><td>전화번호</td><td>${ph}</td><td>주소</td><td>${ad}</td></tr></table>
 <h3>동의 항목</h3>
-<table class="agree-table"><tr><td>6. 개인정보 수집·이용 동의</td><td>귀하의 소중한 개인정보는 의료법 및 개인정보보호법의 관련규정에 의하여 진료 및 진료 지원의 목적으로 수집 및 이용됩니다.<br><strong style="color:${a1?'#27ae60':'#c0392b'}">${a1?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>7. 진단서 발급 관련 동의</td><td>금일 진료 후 진단서 발급 불가하며, 최소 1~2개월의 외래 진료 후 발급 가능함을 확인합니다.<br><strong style="color:${a2?'#27ae60':'#c0392b'}">${a2?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>8. 본인 확인 불가 시 진료 불가 동의</td><td>주민등록증, 운전면허증 등으로 본인 확인이 되지 않을 경우 진료 불가함에 동의합니다.<br><strong style="color:${a3?'#27ae60':'#c0392b'}">${a3?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>9. 발급 서류 환불 불가 동의</td><td>발급된 서류는 환불이 되지 않음을 이해하고 동의합니다.<br><strong style="color:${a4?'#27ae60':'#c0392b'}">${a4?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>10. 상담료·검사비 발생 동의</td><td>약 처방이 없더라도 상담료 및 검사비 등이 발생됨을 이해하고 동의합니다.<br><strong style="color:${a5?'#27ae60':'#c0392b'}">${a5?'✔ 동의':'✘ 미동의'}</strong></td></tr></table>
+<table class="agree-table"><tr><td>6. 개인정보 수집·이용 동의</td><td>귀하의 소중한 개인정보는 의료법 및 개인정보보호법의 관련규정에 의하여 진료 및 진료 지원의 목적으로 수집 및 이용됩니다.<br><strong style="color:${a1?'#27ae60':'#c0392b'}">${a1?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>7. 진단서 발급 관련 동의</td><td>금일 진료 후 진단서 발급 불가하며, 최소 1~2개월의 외래 진료 후 발급 가능함을 확인합니다.<br><strong style="color:${a2?'#27ae60':'#c0392b'}">${a2?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>8. 본인 확인 불가 시 진료 불가 동의</td><td>주민등록증, 운전면허증 등으로 본인 확인이 되지 않을 경우 진료 불가함에 동의합니다.<br><strong style="color:${a3?'#27ae60':'#c0392b'}">${a3?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>9. 발급 서류 환불 불가 동의</td><td>발급된 서류는 환불이 되지 않음을 이해하고 동의합니다.<br><strong style="color:${a4?'#27ae60':'#c0392b'}">${a4?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>10. 상담료·검사비 발생 동의</td><td>약 처방이 없더라도 상담료 및 검사비 등이 발생됨을 이해하고 동의합니다.<br><strong style="color:${a5?'#27ae60':'#c0392b'}">${a5?'✔ 동의':'✘ 미동의'}</strong></td></tr><tr><td>11. CCTV 촬영 안내 확인</td><td>본 병원은 24시간 CCTV 촬영 중임을 알려드립니다.<br><strong style="color:${a6?'#27ae60':'#c0392b'}">${a6?'✔ 확인':'✘ 미확인'}</strong></td></tr></table>
 <div class="sig-section"><span class="sig-label">서명 (이름 정자)</span><img src="${sigDataUrl}" class="sig-img" alt="서명"><span class="footer" style="margin-left:auto">${filename} | ${today}</span></div>
 <button class="no-print" onclick="window.print()" style="margin-top:14px;padding:12px 28px;background:#1a3a5c;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">🖨️ 인쇄 / PDF 저장</button>
 </body></html>`;
@@ -3116,7 +3238,7 @@ async function cj2Submit(){
   if(!win){toast('팝업 차단을 해제해주세요.');return;}
   win.document.write(pdfHtml);win.document.close();
   try{
-    await fetch(SHEET_WEB_APP_URL2,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'초진',row:[dr2FullDate(),chart,n,i1,i2,ph,ad,a1?'동의':'미동의',a2?'동의':'미동의',a3?'동의':'미동의',a4?'동의':'미동의',a5?'동의':'미동의','(드라이브링크)',filename],signature:sigDataUrl})});
+    await fetch(SHEET_WEB_APP_URL2,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'초진',row:[dr2FullDate(),chart,n,i1,i2,ph,ad,a1?'동의':'미동의',a2?'동의':'미동의',a3?'동의':'미동의',a4?'동의':'미동의',a5?'동의':'미동의',a6?'확인':'미확인','(드라이브링크)',filename],signature:sigDataUrl})});
     toast('✅ PDF 저장 + 시트 전송 완료!');
   }catch(e){toast('📄 PDF 저장 완료');}
 }
@@ -3124,13 +3246,267 @@ async function cj2Submit(){
 function cj2ResetForm(){
   if(!confirm('모든 입력 내용을 초기화할까요?'))return;
   ['cj2-name','cj2-id1','cj2-id2','cj2-phone','cj2-addr'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['cj2-agree1','cj2-agree2','cj2-agree3','cj2-agree4','cj2-agree5'].forEach(id=>{
+  ['cj2-agree1','cj2-agree2','cj2-agree3','cj2-agree4','cj2-agree5','cj2-agree6'].forEach(id=>{
     const cb=document.getElementById(id);if(cb)cb.checked=false;
     const lbl=document.getElementById(id+'-label');if(lbl){lbl.style.borderColor='#d8d0c4';lbl.style.background='white';}
   });
   cj2ClearSig();cj2EditChart();document.getElementById('cj2-chart').value='';
   document.getElementById('cj2-form-body').style.display='none';
   toast('초기화 완료');
+}
+
+// ══ 잠금 해제 ══════════════════════════════════════════
+function unlockApp() {
+  const pw = document.getElementById('lock-pw-input').value;
+  if (pw === 'hanriver0325') {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('lock-err').style.display = 'none';
+  } else {
+    document.getElementById('lock-err').style.display = 'block';
+    document.getElementById('lock-pw-input').value = '';
+    document.getElementById('lock-pw-input').focus();
+  }
+}
+
+// ══ 접수 조회 ══════════════════════════════════════════
+const SUPA_URL  = 'https://rurbfcocihvapbtdzbyt.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1cmJmY29jaWh2YXBidGR6Ynl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTUzMzQsImV4cCI6MjA5MjUzMTMzNH0.Y89bwZlS5ciqfhF9IRbF8oGa9CmFRsP6msFbp7DVypc';
+
+let currentModalData = null;
+
+function loadSearchTab() {
+  document.getElementById('search-type').value = 'all';
+  document.getElementById('search-chart').value = '';
+  document.getElementById('search-name').value = '';
+  doSearch();
+}
+
+async function doSearch() {
+  const type  = document.getElementById('search-type').value;
+  const chart = document.getElementById('search-chart').value.trim();
+  const name  = document.getElementById('search-name').value.trim();
+  const el    = document.getElementById('search-results');
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:#6b7280;">⏳ 조회 중...</div>';
+
+  const tables = type === 'all' ? ['chojin','daeri'] : [type];
+  let allRows = [];
+
+  for (const tbl of tables) {
+    let url = `${SUPA_URL}/rest/v1/${tbl}?order=created_at.desc&limit=100`;
+    if (chart) url += `&chart=eq.${encodeURIComponent(chart)}`;
+    if (name)  url += `&${tbl==='chojin'?'name':'visitor_name'}=ilike.*${encodeURIComponent(name)}*`;
+    try {
+      const r = await fetch(url, { headers: { 'apikey': SUPA_ANON, 'Authorization': `Bearer ${SUPA_ANON}` }});
+      const rows = await r.json();
+      if (Array.isArray(rows)) allRows.push(...rows.map(row => ({...row, _table: tbl})));
+    } catch(e) {}
+  }
+
+  allRows.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+  if (!allRows.length) { el.innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af;">검색 결과가 없습니다.</div>'; return; }
+
+  el.innerHTML = allRows.map(row => {
+    const isCj  = row._table === 'chojin';
+    const name  = isCj ? (row.name||'-') : (row.visitor_name||'-');
+    const chart = row.chart || '-';
+    const dt    = new Date(row.created_at).toLocaleString('ko-KR');
+    const badge = isCj
+      ? `<span style="background:#dbeafe;color:#1d4ed8;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;">초진</span>`
+      : `<span style="background:#d1fae5;color:#065f46;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;">대리</span>`;
+    return `<div onclick="openDetail('${row.id}','${row._table}')"
+      style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;"
+      onmouseover="this.style.borderColor='#1a3a5c'" onmouseout="this.style.borderColor='#e5e7eb'">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        ${badge}
+        <span style="font-size:14px;font-weight:600;">${name}</span>
+        <span style="color:#9ca3af;font-size:12px;margin-left:4px;">차트 ${chart}</span>
+      </div>
+      <div style="font-size:11px;color:#9ca3af;">${dt}</div>
+    </div>`;
+  }).join('');
+}
+
+async function openDetail(id, table) {
+  const r = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+    headers: { 'apikey': SUPA_ANON, 'Authorization': `Bearer ${SUPA_ANON}` }
+  });
+  const rows = await r.json();
+  if (!rows.length) return;
+  const row = rows[0];
+  currentModalData = { row, table };
+
+  document.getElementById('modal-title').textContent =
+    table === 'chojin' ? `초진 접수 — ${row.name||''}` : `대리 처방 — ${row.visitor_name||''}`;
+
+  const dt = new Date(row.created_at).toLocaleString('ko-KR');
+  let html = '';
+
+  if (table === 'chojin') {
+    const idStr = (row.id1||'') + ' - ' + (row.id2||'');
+    html = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
+      ${tr('접수일시', dt)}
+      ${tr('차트번호', row.chart)}
+      ${trCopy('성명', row.name||'')}
+      ${trCopy('주민번호', idStr)}
+      ${trCopy('전화번호', row.phone||'')}
+      ${trCopy('주소', row.addr||'')}
+      ${tr('개인정보 동의(6)', row.agree1?'✅':'❌')}
+      ${tr('진단서 발급 동의(7)', row.agree2?'✅':'❌')}
+      ${tr('본인확인 불가 동의(8)', row.agree3?'✅':'❌')}
+      ${tr('서류환불 불가 동의(9)', row.agree4?'✅':'❌')}
+      ${tr('상담료·검사비 동의(10)', row.agree5?'✅':'❌')}
+      ${tr('CCTV 확인(11)', row.agree6?'✅':'❌')}
+    </table>
+    ${row.signature_url ? `<div style="margin-top:14px;"><div style="font-size:11px;color:#6b7280;margin-bottom:5px;">서명</div><img src="${row.signature_url}" style="border:1px solid #e5e7eb;border-radius:8px;max-width:100%;max-height:140px;background:#f9fafb;"></div>` : '<div style="color:#9ca3af;margin-top:10px;font-size:12px;">서명 이미지 없음</div>'}`;
+  } else {
+    html = `<table style="width:100%;border-collapse:collapse;font-size:13px;">
+      ${tr('접수일시', dt)}
+      ${tr('차트번호', row.chart)}
+      <tr><td colspan="2" style="padding:6px 0;font-weight:bold;color:#2563eb;border-bottom:1px solid #f3f4f6;font-size:12px;">▸ 대리수령자</td></tr>
+      ${tr('성명', row.visitor_name)} ${tr('연락처', row.visitor_phone)}
+      ${tr('생년월일', row.visitor_birth)} ${tr('주소', row.visitor_addr)}
+      ${tr('환자와의 관계', row.relation)}
+      <tr><td colspan="2" style="padding:6px 0;font-weight:bold;color:#16a34a;border-bottom:1px solid #f3f4f6;font-size:12px;">▸ 환자 정보</td></tr>
+      ${tr('환자 성명', row.patient_name)} ${tr('환자 연락처', row.patient_phone)}
+      ${tr('환자 생년월일', row.patient_birth)} ${tr('환자 주소', row.patient_addr)}
+      ${tr('대리수령 사유', row.reason)}
+    </table>
+    ${row.signature_url ? `<div style="margin-top:14px;"><div style="font-size:11px;color:#6b7280;margin-bottom:5px;">서명</div><img src="${row.signature_url}" style="border:1px solid #e5e7eb;border-radius:8px;max-width:100%;max-height:140px;background:#f9fafb;"></div>` : '<div style="color:#9ca3af;margin-top:10px;font-size:12px;">서명 이미지 없음</div>'}`;
+  }
+
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('detail-modal').style.display = 'block';
+}
+
+function tr(label, val) {
+  return `<tr style="border-bottom:1px solid #f3f4f6;">
+    <td style="padding:7px 4px;color:#6b7280;width:120px;vertical-align:middle;">${label}</td>
+    <td style="padding:7px 4px;font-weight:500;">${val||'-'}</td></tr>`;
+}
+
+function trCopy(label, val) {
+  const safe = (val||'-').replace(/'/g,"\\'");
+  return `<tr style="border-bottom:1px solid #f3f4f6;">
+    <td style="padding:7px 4px;color:#6b7280;width:120px;vertical-align:middle;">${label}</td>
+    <td style="padding:5px 4px;font-weight:500;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="flex:1;">${val||'-'}</span>
+        <button onclick="copyCell('${safe}',this)"
+          style="flex-shrink:0;background:#f0f9ff;border:1px solid #bae6fd;color:#0369a1;border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;white-space:nowrap;">
+          📋 복사
+        </button>
+      </div>
+    </td></tr>`;
+}
+
+function copyCell(text, btn) {
+  if (!text || text === '-') return;
+  const orig = btn.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ 복사됨';
+    btn.style.background = '#f0fdf4'; btn.style.borderColor = '#86efac'; btn.style.color = '#15803d';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = '#f0f9ff'; btn.style.borderColor = '#bae6fd'; btn.style.color = '#0369a1'; }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    btn.textContent = '✅'; setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+function closeModal() { document.getElementById('detail-modal').style.display = 'none'; }
+
+function printModalPDF() {
+  if (!currentModalData) return;
+  const { row, table } = currentModalData;
+  const name = table === 'chojin' ? (row.name||'') : (row.visitor_name||'');
+  const dt = new Date(row.created_at).toLocaleString('ko-KR');
+  const content = document.getElementById('modal-body').innerHTML;
+  const w = window.open('','_blank');
+  if (!w) { toast('팝업 차단을 해제해주세요.'); return; }
+  w.document.write(`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${name} 접수내역</title>
+  <style>body{font-family:'Noto Sans KR',sans-serif;padding:20px;font-size:13px}table{width:100%;border-collapse:collapse}td{padding:8px 6px;border-bottom:1px solid #eee}@media print{button{display:none}}</style>
+  </head><body><h3 style="margin-bottom:14px;">${table==='chojin'?'초진 접수':'대리 처방'} — ${name} (${dt})</h3>
+  ${content}
+  <button onclick="window.print()" style="margin-top:20px;padding:10px 24px;background:#1a3a5c;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;">🖨️ 인쇄 / PDF 저장</button>
+  </body></html>`);
+  w.document.close();
+}
+
+function openEditModal() {
+  if (!currentModalData) return;
+  document.getElementById('edit-pw-input').value = '';
+  document.getElementById('edit-pw-section').style.display = 'block';
+  document.getElementById('edit-fields-section').style.display = 'none';
+  document.getElementById('edit-modal').style.display = 'block';
+}
+function closeEditModal() { document.getElementById('edit-modal').style.display = 'none'; }
+
+function verifyEditPw() {
+  if (document.getElementById('edit-pw-input').value !== 'hanriver0325') {
+    alert('⚠️ 비밀번호가 틀렸습니다.');
+    document.getElementById('edit-pw-input').value = ''; return;
+  }
+  const { row, table } = currentModalData;
+  const currentName  = table === 'chojin' ? (row.name||'') : (row.visitor_name||'');
+  const currentChart = row.chart||'';
+  document.getElementById('edit-name-label').textContent  = `(현재: ${currentName})`;
+  document.getElementById('edit-chart-label').textContent = `(현재: ${currentChart})`;
+  document.getElementById('edit-name-input').value  = currentName;
+  document.getElementById('edit-chart-input').value = currentChart;
+  document.getElementById('edit-pw-section').style.display    = 'none';
+  document.getElementById('edit-fields-section').style.display = 'block';
+}
+
+async function saveEdit() {
+  if (!currentModalData) return;
+  const { row, table } = currentModalData;
+  const newName  = document.getElementById('edit-name-input').value.trim();
+  const newChart = document.getElementById('edit-chart-input').value.trim();
+  if (!newName || !newChart) { alert('이름과 차트번호를 모두 입력해주세요.'); return; }
+  if (!confirm(`수정하시겠습니까?\n이름: ${newName}\n차트번호: ${newChart}`)) return;
+  const nameField = table === 'chojin' ? 'name' : 'visitor_name';
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(row.id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPA_ANON}`, 'apikey':SUPA_ANON, 'Prefer':'return=representation' },
+      body: JSON.stringify({ [nameField]: newName, chart: newChart })
+    });
+    if (r.ok) { toast('✅ 수정 완료!'); closeEditModal(); closeModal(); doSearch(); }
+    else { const err = await r.text(); alert(`❌ 수정 실패 (${r.status}):\n${err}`); }
+  } catch(e) { alert(`❌ 오류: ${e.message}`); }
+}
+
+function openDeleteModal() {
+  if (!currentModalData) return;
+  document.getElementById('delete-pw-input').value = '';
+  const { row, table } = currentModalData;
+  const name = table === 'chojin' ? (row.name||'') : (row.visitor_name||'');
+  const dt   = new Date(row.created_at).toLocaleString('ko-KR');
+  document.getElementById('delete-target-info').textContent =
+    `${table==='chojin'?'초진':'대리'}  ${name}  차트 ${row.chart||'-'}  (${dt})`;
+  document.getElementById('delete-modal').style.display = 'block';
+}
+function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; }
+
+async function confirmDelete() {
+  if (document.getElementById('delete-pw-input').value !== 'hanriver0325') {
+    alert('⚠️ 비밀번호가 틀렸습니다.');
+    document.getElementById('delete-pw-input').value = ''; return;
+  }
+  if (!currentModalData) return;
+  const { row, table } = currentModalData;
+  const name = table === 'chojin' ? (row.name||'') : (row.visitor_name||'');
+  if (!confirm(`정말 삭제하시겠습니까?\n복구할 수 없습니다.\n\n대상: ${name} / 차트 ${row.chart||'-'}`)) return;
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(row.id)}`, {
+      method: 'DELETE',
+      headers: { 'Authorization':`Bearer ${SUPA_ANON}`, 'apikey':SUPA_ANON, 'Prefer':'return=minimal' }
+    });
+    if (r.ok) { toast('🗑️ 삭제 완료!'); closeDeleteModal(); closeModal(); doSearch(); }
+    else { const err = await r.text(); alert(`❌ 삭제 실패 (${r.status}):\n${err}`); }
+  } catch(e) { alert(`❌ 오류: ${e.message}`); }
 }
 
 
