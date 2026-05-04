@@ -3238,9 +3238,29 @@ async function cj2Submit(){
   if(!win){toast('팝업 차단을 해제해주세요.');return;}
   win.document.write(pdfHtml);win.document.close();
   try{
+    // ── Supabase INSERT ──
+    const supaRes = await fetch(`${SUPA_URL}/rest/v1/chojin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPA_ANON}`,
+        'apikey': SUPA_ANON,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        chart, name: n, id1: i1, id2: i2, phone: ph, addr: ad,
+        agree1: a1, agree2: a2, agree3: a3, agree4: a4, agree5: a5, agree6: a6,
+        filename
+      })
+    });
+    if (!supaRes.ok) {
+      const errText = await supaRes.text();
+      console.error('Supabase 저장 실패:', supaRes.status, errText);
+    }
+    // ── 구글 시트 전송 ──
     await fetch(SHEET_WEB_APP_URL2,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'초진',row:[dr2FullDate(),chart,n,i1,i2,ph,ad,a1?'동의':'미동의',a2?'동의':'미동의',a3?'동의':'미동의',a4?'동의':'미동의',a5?'동의':'미동의',a6?'확인':'미확인','(드라이브링크)',filename],signature:sigDataUrl})});
-    toast('✅ PDF 저장 + 시트 전송 완료!');
-  }catch(e){toast('📄 PDF 저장 완료');}
+    toast('✅ 저장 완료!');
+  }catch(e){toast('📄 PDF 저장 완료 (네트워크 오류)'); console.error(e);}
 }
 
 function cj2ResetForm(){
