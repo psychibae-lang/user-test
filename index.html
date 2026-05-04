@@ -604,7 +604,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div style="font-size:12px;font-weight:600;color:#888;margin-bottom:8px;margin-top:4px">개별 선택</div>
       <div class="scale-grid" id="scale-grid"></div>
       <div class="sel-box">
-        <div class="sel-lbl">선택된 검사</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div class="sel-lbl" style="margin-bottom:0;">선택된 검사</div>
+          <button onclick="clearAllScales()" id="clear-all-btn"
+            style="display:none;padding:3px 10px;background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;line-height:1.4;">
+            ✕ 전체 해제
+          </button>
+        </div>
         <div class="chips" id="chips"><span style="font-size:11px;color:#94a3b8">검사지를 선택해 주세요</span></div>
       </div>
     </div>
@@ -1303,7 +1309,13 @@ function toggleSc(id){
 
 function renderChips(){
   const c=document.getElementById('chips');
-  if(selScales.size===0){c.innerHTML='<span style="font-size:11px;color:#94a3b8">검사지를 선택해 주세요</span>';return;}
+  const clearBtn=document.getElementById('clear-all-btn');
+  if(selScales.size===0){
+    c.innerHTML='<span style="font-size:11px;color:#94a3b8">검사지를 선택해 주세요</span>';
+    if(clearBtn) clearBtn.style.display='none';
+    return;
+  }
+  if(clearBtn) clearBtn.style.display='inline-block';
   c.innerHTML=[...selScales].map(id=>{
     const m=SCALES[id];
     return`<div class="chip"><span>${m?m.name:id}</span><span class="rm" onclick="removeSc('${id}')">×</span></div>`;
@@ -1311,6 +1323,14 @@ function renderChips(){
 }
 
 function removeSc(id){selScales.delete(id);renderScaleGrid();renderChips();}
+
+function clearAllScales(){
+  selScales.clear();
+  renderScaleGrid();
+  renderChips();
+  // 카테고리 버튼 활성 상태도 초기화
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('act'));
+}
 
 async function issue(type){
   if(selScales.size===0){toast('검사지를 1개 이상 선택하세요.');return;}
@@ -1324,13 +1344,15 @@ const sid='s-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
   document.getElementById('link-url-txt').textContent=url;
   document.getElementById('link-result').style.display='block';
   document.getElementById('qr-wrap').style.display='none';
-  if(type==='direct'){window.open(url,'_blank');return;}
+  if(type==='direct'){clearAllScales();window.open(url,'_blank');return;}
   if(type==='qr'){
     document.getElementById('qr-wrap').style.display='block';
     document.getElementById('qr-container').innerHTML='';
     new QRCode(document.getElementById('qr-container'),{text:url,width:180,height:180});
   }
   toast('발급 완료!');loadStatus();
+  // 발급 후 선택 자동 해제
+  clearAllScales();
 }
 
 async function loadStatus(){
@@ -3160,9 +3182,21 @@ async function dr2Submit(){
   win.document.write(buildDr2PdfHtml(data,sigDataUrl));
   win.document.close();
   try{
-    await fetch(SHEET_WEB_APP_URL2,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'대리',row:[dr2FullDate(),chart,vn,vp,vb,va,rel,pn,pp,pb,pa,rsn,'(드라이브링크)',filename],signature:sigDataUrl})});
-    toast('✅ PDF 저장 + 시트 전송 완료!');
-  }catch(e){toast('📄 PDF 창 열림');}
+    // ── 서명 Storage 업로드 → DB INSERT ──
+    const sigUrl = await uploadSignature(sigDataUrl, filename);
+    await insertToSupabase('daeri', {
+      chart,
+      visitor_name:  vn, visitor_phone: vp, visitor_birth: vb, visitor_addr: va,
+      relation:      rel,
+      patient_name:  pn, patient_phone: pp, patient_birth: pb, patient_addr: pa,
+      reason:        rsn,
+      signature_url: sigUrl,
+      filename
+    });
+    // ── 구글 시트 전송 ──
+    await fetch(SHEET_WEB_APP_URL2,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'대리',row:[dr2FullDate(),chart,vn,vp,vb,va,rel,pn,pp,pb,pa,rsn,sigUrl||'(드라이브링크)',filename],signature:sigDataUrl})});
+    toast('✅ 저장 완료!');
+  }catch(e){toast('📄 PDF 저장 완료 (네트워크 오류)'); console.error(e);}
 }
 
 function dr2ResetForm(){
@@ -3238,27 +3272,16 @@ async function cj2Submit(){
   if(!win){toast('팝업 차단을 해제해주세요.');return;}
   win.document.write(pdfHtml);win.document.close();
   try{
-    // ── Supabase INSERT ──
-    const supaRes = await fetch(`${SUPA_URL}/rest/v1/chojin`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPA_ANON}`,
-        'apikey': SUPA_ANON,
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({
-        chart, name: n, id1: i1, id2: i2, phone: ph, addr: ad,
-        agree1: a1, agree2: a2, agree3: a3, agree4: a4, agree5: a5, agree6: a6,
-        filename
-      })
+    // ── 서명 Storage 업로드 → DB INSERT ──
+    const sigUrl = await uploadSignature(sigDataUrl, filename);
+    await insertToSupabase('chojin', {
+      chart, name: n, id1: i1, id2: i2, phone: ph, addr: ad,
+      agree1: a1, agree2: a2, agree3: a3, agree4: a4, agree5: a5, agree6: a6,
+      signature_url: sigUrl,
+      filename
     });
-    if (!supaRes.ok) {
-      const errText = await supaRes.text();
-      console.error('Supabase 저장 실패:', supaRes.status, errText);
-    }
     // ── 구글 시트 전송 ──
-    await fetch(SHEET_WEB_APP_URL2,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'초진',row:[dr2FullDate(),chart,n,i1,i2,ph,ad,a1?'동의':'미동의',a2?'동의':'미동의',a3?'동의':'미동의',a4?'동의':'미동의',a5?'동의':'미동의',a6?'확인':'미확인','(드라이브링크)',filename],signature:sigDataUrl})});
+    await fetch(SHEET_WEB_APP_URL2,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({sheet:'초진',row:[dr2FullDate(),chart,n,i1,i2,ph,ad,a1?'동의':'미동의',a2?'동의':'미동의',a3?'동의':'미동의',a4?'동의':'미동의',a5?'동의':'미동의',a6?'확인':'미확인',sigUrl||'(드라이브링크)',filename],signature:sigDataUrl})});
     toast('✅ 저장 완료!');
   }catch(e){toast('📄 PDF 저장 완료 (네트워크 오류)'); console.error(e);}
 }
@@ -3291,6 +3314,52 @@ function unlockApp() {
 // ══ 접수 조회 ══════════════════════════════════════════
 const SUPA_URL  = 'https://rurbfcocihvapbtdzbyt.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1cmJmY29jaWh2YXBidGR6Ynl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTUzMzQsImV4cCI6MjA5MjUzMTMzNH0.Y89bwZlS5ciqfhF9IRbF8oGa9CmFRsP6msFbp7DVypc';
+const SUPA_BUCKET = 'signatures';
+
+// ── Supabase: 서명 이미지 Storage 업로드 ──────────
+async function uploadSignature(sigDataUrl, filename) {
+  try {
+    const res  = await fetch(sigDataUrl);
+    const blob = await res.blob();
+    const safeName = filename.replace(/[^a-zA-Z0-9_\-]/g, '').slice(0, 60);
+    const path = `${safeName}_${Date.now()}.png`;
+    const uploadRes = await fetch(
+      `${SUPA_URL}/storage/v1/object/${SUPA_BUCKET}/${path}`,
+      { method:'POST', headers:{ 'Authorization':`Bearer ${SUPA_ANON}`, 'apikey':SUPA_ANON, 'Content-Type':'image/png', 'x-upsert':'true' }, body: blob }
+    );
+    if (!uploadRes.ok) {
+      const errText = await uploadRes.text();
+      console.error('서명 업로드 실패:', uploadRes.status, errText);
+      toast(`❌ 서명 업로드 실패(${uploadRes.status}): ${errText.slice(0,80)}`);
+      return null;
+    }
+    return `${SUPA_URL}/storage/v1/object/public/${SUPA_BUCKET}/${path}`;
+  } catch(e) {
+    console.error('uploadSignature 오류:', e);
+    return null;
+  }
+}
+
+// ── Supabase: DB 행 삽입 ──────────────────────────
+async function insertToSupabase(table, payload) {
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPA_ANON}`, 'apikey':SUPA_ANON, 'Prefer':'return=minimal' },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) {
+      const errBody = await r.text();
+      console.error('Supabase insert 실패:', r.status, errBody);
+      toast(`❌ DB 저장 실패(${r.status}): ${errBody.slice(0,80)}`);
+      return false;
+    }
+    return true;
+  } catch(e) {
+    console.error('insertToSupabase 오류:', e);
+    return false;
+  }
+}
 
 let currentModalData = null;
 
