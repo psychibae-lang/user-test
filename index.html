@@ -1264,6 +1264,15 @@ function init(){
 window.addEventListener('hashchange',()=>{if(location.hash.startsWith('#s-'))loadPatientSession(location.hash.slice(3));});
 
 function switchSubTab(tab,el){
+  // 접수 조회: 매번 비밀번호 확인
+  if(tab==='search'){
+    const pw = prompt('🔒 접수 조회\n관리자 비밀번호를 입력하세요:');
+    if(pw === null) return;
+    if(pw !== 'hanriver0325'){
+      alert('⚠️ 비밀번호가 올바르지 않습니다.');
+      return;
+    }
+  }
   document.querySelectorAll('.sub-hdr span').forEach(s=>s.classList.remove('act'));
   el.classList.add('act');
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('act'));
