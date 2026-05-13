@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SELSI 영·유아 언어발달 검사</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -359,6 +358,27 @@
   @media (max-width: 480px) {
     .intro-features { grid-template-columns: 1fr 1fr; }
   }
+
+/* ── 인쇄 CSS ── */
+@media print {
+  @page { size: A4; margin: 15mm 15mm 15mm 15mm; }
+  body { background: white !important; }
+  .app-shell, #app { background: white !important; }
+  /* 인쇄 시 불필요한 UI 숨기기 */
+  .step-nav, .btn-row, .nav-actions, .feat-label,
+  button, .progress-bar-wrap, .age-group-btn,
+  .chk-item input[type=checkbox] { display: none !important; }
+  /* 결과 섹션만 표시 */
+  .print-section { display: block !important; }
+  /* 페이지 나눔 */
+  .score-cards { page-break-inside: avoid; }
+  .profile-section { page-break-inside: avoid; }
+  .opinion-box { page-break-inside: avoid; }
+  /* 색상 강제 출력 */
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  /* 폰트 */
+  * { font-family: 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif !important; }
+}
 </style>
 </head>
 <body>
@@ -995,11 +1015,8 @@ function renderResult() {
   document.getElementById("resultContent").innerHTML = html;
 }
 
-// ── PDF 출력 ──
+// ── PDF 출력 (브라우저 인쇄 방식 - 한글 완벽 지원) ──
 function downloadPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation:"portrait", unit:"mm", format:"a4" });
-
   const sc = calcScores();
   const rProfile = groupProfile("receptive");
   const eProfile = groupProfile("expressive");
@@ -1007,196 +1024,149 @@ function downloadPDF() {
     ? new Date(state.examDate).toLocaleDateString("ko-KR")
     : "-";
 
-  const W = 210, M = 20;
-  let y = 20;
+  const getInterpLabel = (cls) =>
+    cls === "normal" ? "정상" : cls === "mild" ? "약간지연" : "발달지연";
+  const getInterpColor = (cls) =>
+    cls === "normal" ? "#16a34a" : cls === "mild" ? "#d97706" : "#dc2626";
 
-  // 헤더
-  doc.setFillColor(30, 58, 138);
-  doc.rect(0, 0, W, 32, "F");
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(20); doc.setFont("helvetica","bold");
-  doc.text("SELSI", M, 13);
-  doc.setFontSize(12); doc.setFont("helvetica","normal");
-  doc.text("Sequenced Language Scale for Infants", M, 20);
-  doc.setFontSize(9);
-  doc.text("Young-Tae Kim & Kyung-Hee Kim (2004) | Assessment Report", M, 27);
-  y = 42;
-
-  // 기본 정보 박스
-  doc.setFillColor(248, 250, 252);
-  doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(M, y, W-M*2, 28, 3, 3, "FD");
-  doc.setTextColor(30,41,59);
-  doc.setFontSize(10); doc.setFont("helvetica","bold");
-  doc.text("아동 정보", M+6, y+8);
-  doc.setFont("helvetica","normal"); doc.setFontSize(9);
-  doc.setTextColor(71,85,105);
-  const info = [
-    ["이름", state.childName || "-"],
-    ["성별", state.gender || "-"],
-    ["생활연령", `${sc.age}개월 (${Math.floor(sc.age/12)}세 ${sc.age%12}개월)`],
-    ["검사일", examDateFmt],
-    ["검사자", state.examiner || "-"],
-  ];
-  const colW = (W - M*2 - 12) / 3;
-  info.forEach((item, i) => {
-    const col = i % 3, row = Math.floor(i / 3);
-    const x = M + 6 + col * (colW + 2);
-    const iy = y + 16 + row * 8;
-    doc.setFont("helvetica","bold"); doc.setTextColor(100,116,139);
-    doc.text(item[0] + ":", x, iy);
-    doc.setFont("helvetica","normal"); doc.setTextColor(30,41,59);
-    doc.text(item[1], x + 20, iy);
-  });
-  y += 36;
-
-  // 점수 요약
-  doc.setFillColor(30,58,138); doc.setTextColor(255,255,255);
-  doc.rect(M, y, W-M*2, 8, "F");
-  doc.setFontSize(10); doc.setFont("helvetica","bold");
-  doc.text("검사 결과 요약", M+4, y+5.5);
-  y += 12;
-
-  const colors = { normal:[22,163,74], mild:[217,119,6], delay:[220,38,38] };
-  function drawScoreBox(label, d, bx, by, bw) {
-    const [r,g,b] = colors[d.interp.cls];
-    doc.setFillColor(r,g,b);
-    doc.rect(bx, by, bw, 6, "F");
-    doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont("helvetica","bold");
-    doc.text(label, bx+3, by+4.2);
-    doc.text(d.interp.label, bx+bw-3, by+4.2, {align:"right"});
-    by += 9;
-    doc.setFillColor(248,250,252); doc.setDrawColor(226,232,240);
-    doc.roundedRect(bx, by, bw, 22, 2, 2, "FD");
-
-    const nums = [
-      ["원점수", `${d.score} / ${d.total}`],
-      ["정반응률", `${d.pct}%`],
-      ["등가월령", `${d.equiv}개월`],
-      ["생활연령", `${d.interp.cls==="normal"?"정상":d.interp.cls==="mild"?"약간지연":"발달지연"}`],
-    ];
-    const nW = bw / 4;
-    nums.forEach(([key,val],i) => {
-      const nx = bx + i * nW + nW/2;
-      doc.setFontSize(14); doc.setFont("helvetica","bold");
-      doc.setTextColor(r,g,b);
-      if (i < 3) doc.text(val, nx, by+12, {align:"center"});
-      else {
-        doc.setFontSize(9);
-        doc.setTextColor(r,g,b);
-        doc.text(val, nx, by+12, {align:"center"});
-      }
-      doc.setFontSize(7); doc.setFont("helvetica","normal"); doc.setTextColor(100,116,139);
-      doc.text(key, nx, by+18, {align:"center"});
-    });
-    return by + 25;
-  }
-
-  const boxW = (W - M*2 - 6) / 2;
-  drawScoreBox("🎧 수용언어 (Receptive Language)", sc.r, M, y, boxW);
-  drawScoreBox("🗣️ 표현언어 (Expressive Language)", sc.e, M + boxW + 6, y, boxW);
-  y += 36;
-
-  // 프로파일 테이블
-  y += 4;
-  doc.setFillColor(30,58,138); doc.setTextColor(255,255,255);
-  doc.rect(M, y, W-M*2, 8, "F");
-  doc.setFontSize(10); doc.setFont("helvetica","bold");
-  doc.text("월령별 수행 프로파일", M+4, y+5.5);
-  y += 12;
-
-  // 테이블 헤더
-  const tW = W-M*2, cols4 = tW/4;
-  doc.setFillColor(241,245,249); doc.setDrawColor(226,232,240);
-  doc.rect(M, y, tW, 7, "FD");
-  doc.setTextColor(71,85,105); doc.setFontSize(8); doc.setFont("helvetica","bold");
-  ["월령 구간","수용언어 통과율","표현언어 통과율","비고"].forEach((h,i) => {
-    doc.text(h, M+cols4*i+4, y+4.8);
-  });
-  y += 8;
-
-  AGE_GROUPS.forEach((g, gi) => {
+  const profileRows = AGE_GROUPS.map((g, gi) => {
     const rp = rProfile[gi], ep = eProfile[gi];
-    doc.setFillColor(gi%2===0?255:248,gi%2===0?255:250,gi%2===0?255:252);
-    doc.rect(M, y, tW, 7, "F");
-    doc.setDrawColor(226,232,240);
-    doc.rect(M, y, tW, 7, "D");
-    doc.setTextColor(30,41,59); doc.setFontSize(8); doc.setFont("helvetica","normal");
-    doc.text(g.label, M+4, y+4.8);
-
-    // 수용언어 바
-    const [rr,rg,rb] = colors[rp.pct>=80?"normal":rp.pct>=50?"mild":"delay"];
-    doc.setFillColor(rr,rg,rb);
-    doc.rect(M+cols4+4, y+2, (cols4-20)*rp.pct/100, 3, "F");
-    doc.setTextColor(rr,rg,rb); doc.setFont("helvetica","bold");
-    doc.text(`${rp.pct}%  (${rp.passed}/${rp.total})`, M+cols4+cols4-2, y+4.8, {align:"right"});
-
-    // 표현언어 바
-    const [er2,eg2,eb2] = colors[ep.pct>=80?"normal":ep.pct>=50?"mild":"delay"];
-    doc.setFillColor(er2,eg2,eb2);
-    doc.rect(M+cols4*2+4, y+2, (cols4-20)*ep.pct/100, 3, "F");
-    doc.setTextColor(er2,eg2,eb2); doc.setFont("helvetica","bold");
-    doc.text(`${ep.pct}%  (${ep.passed}/${ep.total})`, M+cols4*3-2, y+4.8, {align:"right"});
-
-    // 비고
     const note = (rp.pct < 50 || ep.pct < 50) ? "지연 의심" : (rp.pct < 80 || ep.pct < 80) ? "주의 요망" : "정상";
-    const [nr,ng,nb] = note==="지연 의심"?[220,38,38]:note==="주의 요망"?[217,119,6]:[22,163,74];
-    doc.setTextColor(nr,ng,nb);
-    doc.text(note, M+cols4*3+4, y+4.8);
-    y += 7;
-  });
+    const noteColor = note === "지연 의심" ? "#dc2626" : note === "주의 요망" ? "#d97706" : "#16a34a";
+    return `
+      <tr style="background:${gi%2===0?'#fff':'#f8fafc'}">
+        <td style="padding:6px 10px;border:1px solid #e2e8f0;font-size:12px">${g.label}</td>
+        <td style="padding:6px 10px;border:1px solid #e2e8f0;font-size:12px;color:${rp.pct>=80?'#16a34a':rp.pct>=50?'#d97706':'#dc2626'}">
+          ${rp.pct}% (${rp.passed}/${rp.total})
+          <div style="height:4px;background:#e2e8f0;border-radius:2px;margin-top:3px"><div style="height:4px;width:${rp.pct}%;background:${rp.pct>=80?'#16a34a':rp.pct>=50?'#d97706':'#dc2626'};border-radius:2px"></div></div>
+        </td>
+        <td style="padding:6px 10px;border:1px solid #e2e8f0;font-size:12px;color:${ep.pct>=80?'#16a34a':ep.pct>=50?'#d97706':'#dc2626'}">
+          ${ep.pct}% (${ep.passed}/${ep.total})
+          <div style="height:4px;background:#e2e8f0;border-radius:2px;margin-top:3px"><div style="height:4px;width:${ep.pct}%;background:${ep.pct>=80?'#16a34a':ep.pct>=50?'#d97706':'#dc2626'};border-radius:2px"></div></div>
+        </td>
+        <td style="padding:6px 10px;border:1px solid #e2e8f0;font-size:12px;color:${noteColor};font-weight:700">${note}</td>
+      </tr>`;
+  }).join('');
 
-  // 종합 소견
-  y += 8;
-  if (y > 240) { doc.addPage(); y = 20; }
-  doc.setFillColor(30,58,138); doc.setTextColor(255,255,255);
-  doc.rect(M, y, W-M*2, 8, "F");
-  doc.setFontSize(10); doc.setFont("helvetica","bold");
-  doc.text("종합 소견", M+4, y+5.5);
-  y += 12;
+  const opinText = sc.r.interp.cls === "normal" && sc.e.interp.cls === "normal"
+    ? "두 영역 모두 정상 발달 범위 내에 있습니다."
+    : "일부 영역에서 발달 지연이 의심됩니다. 전문 언어치료사에 의한 정밀 평가를 권장합니다.";
 
-  doc.setFillColor(248,250,252); doc.setDrawColor(226,232,240);
-  doc.roundedRect(M, y, W-M*2, 44, 3, 3, "FD");
-  doc.setFillColor(30,58,138); doc.rect(M, y, 3, 44, "F");
+  const printHTML = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>SELSI 결과지 - ${state.childName || '아동'}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap');
+  @page { size: A4; margin: 15mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif; font-size: 13px; color: #1e293b; background: white; }
+  .header { background: #1e3a8a; color: white; padding: 16px 20px 14px; margin-bottom: 16px; }
+  .header h1 { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
+  .header p { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+  .header .sub { font-size: 10px; opacity: 0.7; margin-top: 1px; }
+  .info-box { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; background: #f8fafc; margin-bottom: 16px; }
+  .info-box h2 { font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 10px; }
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 12px; }
+  .info-item { font-size: 12px; }
+  .info-label { color: #64748b; font-weight: 600; }
+  .info-val { color: #1e293b; font-weight: 500; }
+  .section-header { background: #1e3a8a; color: white; padding: 6px 12px; font-size: 12px; font-weight: 700; margin-bottom: 10px; border-radius: 4px; }
+  .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .score-card { border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
+  .score-card-header { padding: 7px 12px; font-size: 11px; font-weight: 700; color: white; }
+  .score-card-body { padding: 12px; background: #f8fafc; display: grid; grid-template-columns: repeat(4,1fr); text-align: center; gap: 4px; }
+  .sc-num { font-size: 18px; font-weight: 900; line-height: 1.1; }
+  .sc-lbl { font-size: 9px; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  th { background: #f1f5f9; padding: 7px 10px; text-align: left; font-size: 11px; font-weight: 700; color: #475569; border: 1px solid #e2e8f0; }
+  .opinion-box { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; background: #f8fafc; position: relative; margin-bottom: 16px; }
+  .opinion-box::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:#1e3a8a; border-radius:4px 0 0 4px; }
+  .opinion-box p { font-size: 12px; line-height: 1.8; color: #334155; margin-left: 6px; }
+  .opinion-warn { font-size: 10px; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 10px; margin-top: 10px; margin-left: 6px; line-height: 1.6; }
+  .sign-row { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; }
+  .sign-line { border-bottom: 1px solid #cbd5e1; width: 140px; padding-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>SELSI</h1>
+  <p>Sequenced Language Scale for Infants</p>
+  <p class="sub">Young-Tae Kim &amp; Kyung-Hee Kim (2004) | Assessment Report</p>
+</div>
 
-  doc.setTextColor(30,41,59); doc.setFontSize(9); doc.setFont("helvetica","normal");
-  const opinLines = [
-    `검사 대상: ${state.childName || "-"} (생활연령 ${sc.age}개월, ${state.gender || "-"})`,
-    `수용언어 등가월령: ${sc.r.equiv}개월 (원점수 ${sc.r.score}/${sc.r.total}, 정반응률 ${sc.r.pct}%) → ${sc.r.interp.label}`,
-    `표현언어 등가월령: ${sc.e.equiv}개월 (원점수 ${sc.e.score}/${sc.e.total}, 정반응률 ${sc.e.pct}%) → ${sc.e.interp.label}`,
-    "",
-    sc.r.interp.cls === "normal" && sc.e.interp.cls === "normal"
-      ? "두 영역 모두 정상 발달 범위 내에 있습니다."
-      : "일부 영역에서 발달 지연이 의심됩니다. 전문 언어치료사에 의한 정밀 평가를 권장합니다.",
-    "",
-    "※ 본 결과는 선별검사 참고용이며, 공식적인 임상 진단 자료로 사용할 수 없습니다.",
-  ];
-  opinLines.forEach((line,i) => {
-    doc.text(line, M+6, y+8+i*5.5);
-  });
+<div class="info-box">
+  <h2>아동 정보</h2>
+  <div class="info-grid">
+    <div class="info-item"><span class="info-label">이름: </span><span class="info-val">${state.childName || '-'}</span></div>
+    <div class="info-item"><span class="info-label">성별: </span><span class="info-val">${state.gender || '-'}</span></div>
+    <div class="info-item"><span class="info-label">생활연령: </span><span class="info-val">${sc.age}개월 (${Math.floor(sc.age/12)}세 ${sc.age%12}개월)</span></div>
+    <div class="info-item"><span class="info-label">검사일: </span><span class="info-val">${examDateFmt}</span></div>
+    <div class="info-item"><span class="info-label">검사자: </span><span class="info-val">${state.examiner || '-'}</span></div>
+  </div>
+</div>
 
-  // 서명란
-  y += 56;
-  if (y > 255) { doc.addPage(); y = 20; }
-  doc.setDrawColor(226,232,240);
-  doc.line(M, y, M+50, y);
-  doc.line(W-M-50, y, W-M, y);
-  doc.setTextColor(100,116,139); doc.setFontSize(8);
-  doc.text("검사자 서명", M+4, y+5);
-  doc.text("날짜: " + examDateFmt, W-M-48, y+5);
+<div class="section-header">검사 결과 요약</div>
+<div class="score-grid">
+  <div class="score-card">
+    <div class="score-card-header" style="background:${getInterpColor(sc.r.interp.cls)}">
+      🎧 수용언어 (Receptive Language) — ${sc.r.interp.label}
+    </div>
+    <div class="score-card-body">
+      <div><div class="sc-num" style="color:${getInterpColor(sc.r.interp.cls)}">${sc.r.score}</div><div class="sc-lbl">원점수</div></div>
+      <div><div class="sc-num" style="color:${getInterpColor(sc.r.interp.cls)}">${sc.r.total}</div><div class="sc-lbl">총 문항</div></div>
+      <div><div class="sc-num" style="color:${getInterpColor(sc.r.interp.cls)}">${sc.r.pct}%</div><div class="sc-lbl">정반응률</div></div>
+      <div><div class="sc-num" style="color:${getInterpColor(sc.r.interp.cls)}">${sc.r.equiv}개월</div><div class="sc-lbl">등가월령</div></div>
+    </div>
+  </div>
+  <div class="score-card">
+    <div class="score-card-header" style="background:${getInterpColor(sc.e.interp.cls)}">
+      🗣️ 표현언어 (Expressive Language) — ${sc.e.interp.label}
+    </div>
+    <div class="score-card-body">
+      <div><div class="sc-num" style="color:${getInterpColor(sc.e.interp.cls)}">${sc.e.score}</div><div class="sc-lbl">원점수</div></div>
+      <div><div class="sc-num" style="color:${getInterpColor(sc.e.interp.cls)}">${sc.e.total}</div><div class="sc-lbl">총 문항</div></div>
+      <div><div class="sc-num" style="color:${getInterpColor(sc.e.interp.cls)}">${sc.e.pct}%</div><div class="sc-lbl">정반응률</div></div>
+      <div><div class="sc-num" style="color:${getInterpColor(sc.e.interp.cls)}">${sc.e.equiv}개월</div><div class="sc-lbl">등가월령</div></div>
+    </div>
+  </div>
+</div>
 
-  // 푸터
-  const pageCount = doc.internal.getNumberOfPages();
-  for (let i=1; i<=pageCount; i++) {
-    doc.setPage(i);
-    doc.setFillColor(248,250,252);
-    doc.rect(0, 287, W, 10, "F");
-    doc.setTextColor(148,163,184); doc.setFontSize(7); doc.setFont("helvetica","normal");
-    doc.text("SELSI Assessment Report | 영·유아 언어발달 검사 결과지", M, 292);
-    doc.text(`Page ${i} / ${pageCount}`, W-M, 292, {align:"right"});
-  }
+<div class="section-header">월령별 수행 프로파일</div>
+<table>
+  <thead>
+    <tr>
+      <th>월령 구간</th>
+      <th>수용언어 통과율</th>
+      <th>표현언어 통과율</th>
+      <th>비고</th>
+    </tr>
+  </thead>
+  <tbody>${profileRows}</tbody>
+</table>
 
-  doc.save(`SELSI_${state.childName || "결과"}_${state.examDate || "검사"}.pdf`);
+<div class="section-header">종합 소견</div>
+<div class="opinion-box">
+  <p>검사 대상: ${state.childName || '-'} (생활연령 ${sc.age}개월, ${state.gender || '-'})</p>
+  <p>수용언어 등가월령: ${sc.r.equiv}개월 (원점수 ${sc.r.score}/${sc.r.total}, 정반응률 ${sc.r.pct}%) → ${sc.r.interp.label}</p>
+  <p>표현언어 등가월령: ${sc.e.equiv}개월 (원점수 ${sc.e.score}/${sc.e.total}, 정반응률 ${sc.e.pct}%) → ${sc.e.interp.label}</p>
+  <p style="margin-top:8px">${opinText}</p>
+  <div class="opinion-warn">⚠️ 본 결과는 선별검사 참고용이며, 공식적인 임상 진단 자료로 사용할 수 없습니다. 정확한 평가는 반드시 자격을 갖춘 언어치료사가 실시해야 합니다.</div>
+</div>
+
+<div class="sign-row">
+  <div><div class="sign-line"></div><div style="margin-top:4px">검사자 서명</div></div>
+  <div style="text-align:right"><div>날짜: ${examDateFmt}</div><div style="margin-top:4px;font-size:10px">SELSI Assessment Report | 영·유아 언어발달 검사 결과지</div></div>
+</div>
+
+<script>window.onload = function(){ window.print(); window.onafterprint = function(){ window.close(); }; }<\/script>
+</body>
+</html>`;
+
+  const printWin = window.open('', '_blank', 'width=800,height=900');
+  printWin.document.write(printHTML);
+  printWin.document.close();
 }
 
 // ── 리셋 ──
