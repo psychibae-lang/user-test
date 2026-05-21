@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MED·RX — 조회</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f7f8fc;
+  --border: #e0e4ef;
+  --accent: #4f8ef7;
+  --success: #18a97a;
+  --warn: #e6a817;
+  --text: #1a1d2e;
+  --text2: #6b7280;
+  --danger: #e53e3e;
+}
+
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+/* ── 헤더 ── */
+header {
+  background: #1a1d2e;
+  border-bottom: 1px solid #2d3154;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.logo { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: #7ab8ff; background: #2d3154; padding: 4px 11px; border-radius: 6px; border: 1px solid #4f8ef7; white-space: nowrap; }
+.header-title { font-size: 16px; color: #fff; font-weight: 800; white-space: nowrap; }
+.header-title span { font-size: 12px; font-weight: 400; color: #a0aec0; }
+.quick-btns { display: flex; align-items: center; gap: 0; }
+.quick-btn { display: inline-flex; align-items: center; gap: 4px; color: #fff; text-decoration: none; font-size: 12px; font-weight: 700; padding: 8px 13px; white-space: nowrap; transition: opacity .15s; }
+.quick-btn:hover { opacity: .85; }
+.quick-btn.blue   { background: linear-gradient(135deg,#4f8ef7,#7c5cfc); border-radius: 8px 0 0 8px; }
+.quick-btn.green  { background: linear-gradient(135deg,#18a97a,#0e7c59); border-left: 1px solid rgba(255,255,255,.2); }
+.quick-btn.yellow { background: linear-gradient(135deg,#e6a817,#c47d0a); border-left: 1px solid rgba(255,255,255,.2); border-radius: 0 8px 8px 0; }
+
+/* ── Key 배너 ── */
+#keyBanner {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 6px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+#keyBanner input { flex: 1; min-width: 160px; background: #f7f8fc; border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; color: var(--text); font-family: monospace; font-size: 12px; outline: none; }
+
+/* ── 메인 탭 ── */
+.main-nav {
+  background: #fff;
+  border-bottom: 2px solid var(--border);
+  padding: 0 20px;
+  display: flex;
+  overflow-x: auto;
+  position: sticky;
+  top: 53px;
+  z-index: 150;
+}
+.main-tab {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text2);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 18px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.main-tab:hover { color: var(--text); }
+.main-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── 서브탭 ── */
+.sub-nav {
+  background: #f7f8fc;
+  border-bottom: 1px solid var(--border);
+  padding: 6px 20px;
+  display: flex;
+  gap: 4px;
+  position: sticky;
+  top: 101px;
+  z-index: 140;
+}
+.sub-tab {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--text2);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.sub-tab:hover { background: #fff; color: var(--text); }
+.sub-tab.active { background: #fff; color: var(--accent); border-color: var(--accent); box-shadow: 0 1px 4px rgba(79,142,247,.15); }
+
+/* ── 공통 ── */
+.container { max-width: 720px; margin: 0 auto; padding: 16px 12px; display: flex; flex-direction: column; gap: 14px; }
+.card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+.card-title { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+.card-title::before { content: ''; width: 3px; height: 12px; background: var(--accent); border-radius: 2px; display: inline-block; }
+label { font-size: 12px; color: var(--text2); font-weight: 500; }
+.input-group { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.input-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+input[type=text], input[type=tel], input[type=password] {
+  background: #f7f8fc; border: 1px solid var(--border); border-radius: 7px;
+  padding: 9px 12px; color: var(--text); font-size: 14px; outline: none;
+  transition: border-color .2s; width: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+input[type=text]:focus, input[type=tel]:focus, input[type=password]:focus { border-color: var(--accent); background: #fff; }
+
+.btn { padding: 9px 16px; border-radius: 8px; border: none; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(79,142,247,.25); }
+.btn-primary:hover:not(:disabled) { background: #3a7ef0; }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+.btn-success { background: var(--success); color: #fff; box-shadow: 0 2px 8px rgba(24,169,122,.2); }
+.btn-success:hover:not(:disabled) { background: #148f68; }
+.btn-success:disabled { opacity: .5; cursor: not-allowed; }
+.btn-outline { background: #fff; border: 1px solid var(--border); color: var(--text2); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-lg { padding: 13px 20px; font-size: 14px; border-radius: 9px; width: 100%; justify-content: center; }
+
+.status-bar { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; font-size: 13px; }
+.status-loading { background: #eef3fe; border: 1px solid #c7d9fb; color: var(--accent); }
+.status-success { background: #e6f7f1; border: 1px solid #a7dfca; color: var(--success); }
+.status-error   { background: #fef0f0; border: 1px solid #fbb; color: var(--danger); }
+.spinner { width: 14px; height: 14px; border: 2px solid #c7d9fb; border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.hidden { display: none !important; }
+
+/* ── 테이블 ── */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: #f7f8fc; color: var(--text2); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--border); user-select: none; }
+th.sortable { cursor: pointer; }
+th.sortable:hover { background: #e8edf8; }
+td { padding: 8px 10px; border-bottom: 1px solid #f0f2f8; color: var(--text); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafbff; }
+.code-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: #eef3fe; color: var(--accent); padding: 2px 7px; border-radius: 4px; border: 1px solid #c7d9fb; }
+.chart-tag { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #b45309; background: #fef3c7; padding: 2px 7px; border-radius: 4px; border: 1px solid #fde68a; cursor: pointer; }
+
+/* ── Toast ── */
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #1a1d2e; color: #fff; padding: 10px 20px; border-radius: 10px;
+  font-size: 13px; font-weight: 600; z-index: 9999; pointer-events: none;
+  opacity: 0; transition: opacity .3s; white-space: pre-wrap; max-width: 90vw; text-align: center;
+}
+#toast.show { opacity: 1; }
+
+/* ── 대리처방 테이블 특이 설정 ── */
+#proxyTable th:nth-child(3), #proxyTable td:nth-child(3) { max-width: 120px; white-space: normal; font-size: 11px; word-break: keep-all; }
+#proxyTable th:nth-child(2), #proxyTable td:nth-child(2),
+#proxyTable th:nth-child(4), #proxyTable td:nth-child(4) { min-width: 60px; }
+
+@media (max-width: 600px) {
+  .container { padding: 10px 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ 헤더 ══ -->
+<header>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="logo">MED·RX</span>
+    <span class="header-title">한강의원 <span>조회시스템</span></span>
+  </div>
+  <div class="quick-btns">
+    <a href="https://psychibae-lang.github.io/admin-test/" target="_blank" rel="noopener" class="quick-btn blue">📋 검사지</a>
+    <a href="https://psychibae-lang.github.io/adm_clinic/" target="_blank" rel="noopener" class="quick-btn green">🖥️ 원격검사</a>
+    <a href="https://temp-share-image-hanriver.web.app/" target="_blank" rel="noopener" class="quick-btn yellow">⏱️ 파일공유</a>
+  </div>
+</header>
+
+<!-- ══ Supabase Key ══ -->
+<div id="keyBanner">
+  <span style="font-size:11px;color:var(--text2);">🔑 Supabase Key</span>
+  <input type="password" id="keyInput" placeholder="eyJhbGci... (service_role 권장)">
+  <button onclick="saveKey()" class="btn btn-primary" style="font-size:11px;padding:5px 10px;">저장</button>
+  <span id="keyStatus" style="font-size:11px;color:var(--text2);"></span>
+</div>
+
+<!-- ══ 메인 탭 ══ -->
+<nav class="main-nav">
+  <button class="main-tab active" id="mainTabSearch">🔎 조회</button>
+</nav>
+
+<!-- ══ 서브탭 ══ -->
+<div class="sub-nav">
+  <button class="sub-tab active" id="subTabProxy"   onclick="switchSubTab('proxy');loadSpecialList('proxy')">📋 대리처방</button>
+  <button class="sub-tab"        id="subTabSelcare" onclick="switchSubTab('selcare');loadSpecialList('selcare')">⭐ 선택의료</button>
+  <button class="sub-tab"        id="subTabPhone"   onclick="switchSubTab('phone')">📞 전화번호</button>
+</div>
+
+<!-- ════════════════════════════════════
+     대리처방 서브탭
+════════════════════════════════════ -->
+<div id="tabProxy" class="container">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div class="card-title" style="margin-bottom:0;">대리처방 환자 명단</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span id="proxyCount" style="font-size:12px;color:var(--text2);"></span>
+        <button class="btn btn-primary" onclick="loadSpecialList('proxy')" style="font-size:11px;padding:6px 10px;">🔄 새로고침</button>
+      </div>
+    </div>
+    <!-- 검색 필터 -->
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
+      <input id="proxySearchChart" type="text" placeholder="챠트" style="width:70px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;" oninput="filterProxyTable()">
+      <input id="proxySearchName"  type="text" placeholder="환자명" style="width:80px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;" oninput="filterProxyTable()">
+      <input id="proxySearchYear"  type="text" placeholder="년도(예:2604)" style="width:100px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;" oninput="filterProxyTable()">
+      <button onclick="clearProxySearch()" style="padding:5px 10px;border:1px solid #ddd;border-radius:6px;font-size:11px;background:#f7f8fc;cursor:pointer;color:#888;">초기화</button>
+    </div>
+    <div id="proxyStatus" class="hidden" style="margin-bottom:10px;"></div>
+    <div style="overflow-x:auto;">
+      <table id="proxyTable">
+        <thead><tr>
+          <th class="sortable" onclick="sortProxyTable('chart')">챠트 <span id="sort_chart">↕</span></th>
+          <th class="sortable" onclick="sortProxyTable('visitor_name')">방문자 <span id="sort_visitor_name">↕</span></th>
+          <th class="sortable" onclick="sortProxyTable('relation')">관계 <span id="sort_relation">↕</span></th>
+          <th class="sortable" onclick="sortProxyTable('patient_name')">환자명 <span id="sort_patient_name">↕</span></th>
+          <th class="sortable" onclick="sortProxyTable('visitor_phone')" style="min-width:100px;">방문자 전화 <span id="sort_visitor_phone">↕</span></th>
+          <th class="sortable" onclick="sortProxyTable('created_at')" style="min-width:60px;">신청일 <span id="sort_created_at">↕</span></th>
+        </tr></thead>
+        <tbody id="proxyBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     선택의료 서브탭
+════════════════════════════════════ -->
+<div id="tabSelcare" class="container hidden">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <div class="card-title" style="margin-bottom:0;">선택의료 환자 명단</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span id="selcareCount" style="font-size:12px;color:var(--text2);"></span>
+        <button class="btn btn-primary" onclick="loadSpecialList('selcare')" style="font-size:11px;padding:6px 10px;">🔄 새로고침</button>
+      </div>
+    </div>
+    <div id="selcareStatus" class="hidden" style="margin-bottom:10px;"></div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr>
+          <th>챠트번호</th>
+          <th>최근내원일</th>
+          <th>다음내원일</th>
+          <th>전화번호</th>
+          <th>서류받은날짜</th>
+        </tr></thead>
+        <tbody id="selcareBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     전화번호 서브탭
+════════════════════════════════════ -->
+<div id="tabPhone" class="container hidden">
+
+  <!-- 미등록 환자 목록 -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <div class="card-title" style="margin-bottom:0;">📵 전화번호 미등록 환자</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="nullPhoneCount" style="font-size:11px;color:var(--text2);"></span>
+        <button class="btn btn-outline" onclick="loadNullPhoneList()" style="font-size:11px;padding:6px 10px;">🔄 조회</button>
+        <button class="btn btn-outline" onclick="downloadNullPhoneCsv()" style="font-size:11px;padding:6px 10px;">📥 CSV</button>
+      </div>
+    </div>
+    <div id="nullPhoneBody">
+      <div style="text-align:center;padding:20px;color:var(--text2);font-size:13px;">🔄 조회 버튼을 눌러주세요</div>
+    </div>
+  </div>
+
+  <!-- 전화번호 변경 -->
+  <div class="card" style="max-width:480px;">
+    <div class="card-title">전화번호 변경</div>
+
+    <!-- STEP 1: 조회 -->
+    <div id="pc2-step1">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <!-- 차트번호로 조회 -->
+        <div>
+          <label style="display:block;margin-bottom:6px;">차트번호로 조회</label>
+          <div class="input-row">
+            <input type="text" id="pc2-chart" placeholder="차트번호 입력" inputmode="numeric"
+              onkeydown="if(event.key==='Enter')pc2Search()" style="flex:1;">
+            <button class="btn btn-primary" onclick="pc2Search()">🔍 조회</button>
+          </div>
+          <div id="pc2-search-msg" style="margin-top:8px;font-size:13px;font-weight:600;min-height:18px;"></div>
+        </div>
+        <!-- 전화번호로 차트번호 찾기 -->
+        <div style="padding-top:12px;border-top:1px solid var(--border);">
+          <label style="display:block;margin-bottom:6px;">전화번호로 차트번호 찾기</label>
+          <div class="input-row">
+            <input type="tel" id="pc2-phone-search" placeholder="01012345678" inputmode="tel"
+              onkeydown="if(event.key==='Enter')pc2SearchByPhone()" style="flex:1;">
+            <button class="btn btn-success" onclick="pc2SearchByPhone()">🔍 조회</button>
+          </div>
+          <div id="pc2-phone-search-msg" style="margin-top:8px;font-size:13px;font-weight:600;min-height:18px;"></div>
+          <div id="pc2-phone-search-result" class="hidden" style="margin-top:10px;background:#f0fdf4;border:1px solid #a7f3d0;border-radius:8px;padding:12px;">
+            <div style="font-size:11px;color:var(--success);font-weight:700;margin-bottom:8px;">📋 조회 결과</div>
+            <div id="pc2-phone-search-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: 새 번호 입력 -->
+    <div id="pc2-step2" class="hidden">
+      <div style="background:#eef3fe;border:1.5px solid #c7d9fb;border-radius:10px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.5px;margin-bottom:6px;">📋 현재 등록된 전화번호</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">차트번호 <strong id="pc2-display-chart" style="color:var(--text);font-family:monospace;"></strong></div>
+        <div style="font-size:20px;font-weight:700;color:var(--accent);letter-spacing:.5px;" id="pc2-current-phone"></div>
+      </div>
+      <div style="text-align:center;color:var(--text2);font-size:13px;font-weight:600;margin-bottom:12px;">↓ 새 번호로 변경</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="input-group">
+          <label>새 전화번호</label>
+          <input type="tel" id="pc2-phone-new" placeholder="01012345678" inputmode="numeric"
+            onkeydown="if(event.key==='Enter')pc2ChangePhone()">
+        </div>
+        <button class="btn btn-success btn-lg" onclick="pc2ChangePhone()">✅ 전화번호 변경하기</button>
+        <button class="btn btn-outline btn-lg" onclick="pc2Reset()">← 차트번호 다시 입력</button>
+        <div id="pc2-phone-result" style="font-size:14px;font-weight:700;text-align:center;min-height:20px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Toast ══ -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════
+// 설정
+// ════════════════════════════════════════
+const SUPA_URL = 'https://qouywglrlahhiilpjech.supabase.co';
+let ANON_KEY = localStorage.getItem('sb_anon_key') || '';
+
+// ════════════════════════════════════════
+// 유틸
+// ════════════════════════════════════════
+function showToast(msg, dur) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(function(){ t.classList.remove('show'); }, dur || 2800);
+}
+
+function today6() {
+  var d = new Date();
+  return String(d.getFullYear()).slice(2) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+}
+
+function fmt6(val) {
+  if (!val) return '';
+  var s = String(val).trim();
+  if (/^\d{6}$/.test(s)) return s;
+  var d = new Date(val);
+  if (!isNaN(d.getTime())) return String(d.getFullYear()).slice(2) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  return s;
+}
+
+function displayDate(d6) {
+  if (!d6 || d6.length !== 6) return d6 || '없음';
+  var days = ['일','월','화','수','목','금','토'];
+  var y = 2000+parseInt(d6.slice(0,2)), mo = parseInt(d6.slice(2,4)), d = parseInt(d6.slice(4,6));
+  return d6 + '(' + days[new Date(y,mo-1,d).getDay()] + ')';
+}
+
+function caToD6(ca) {
+  if (!ca) return '';
+  var d = new Date(ca);
+  if (isNaN(d.getTime())) return '';
+  return String(d.getFullYear()).slice(2) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+}
+
+function setStatus(id, type, msg) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'status-bar status-'+type;
+  el.classList.remove('hidden');
+  if (type === 'loading') el.innerHTML = '<div class="spinner"></div><span>'+msg+'</span>';
+  else el.textContent = msg;
+}
+
+// ════════════════════════════════════════
+// Supabase helpers
+// ════════════════════════════════════════
+function sbH() { return { 'Content-Type':'application/json', 'apikey':ANON_KEY, 'Authorization':'Bearer '+ANON_KEY }; }
+
+function hasKey() {
+  if (!ANON_KEY || ANON_KEY.length < 20) {
+    showToast('⚠️ Supabase Key를 먼저 입력·저장해주세요.', 3500);
+    return false;
+  }
+  return true;
+}
+
+async function sbGet(t, p) {
+  var qs = Object.entries(p).map(function(e){ return e[0]+'='+encodeURIComponent(e[1]); }).join('&');
+  var r = await fetch(SUPA_URL+'/rest/v1/'+t+'?'+qs, { headers: sbH() });
+  if (r.status === 401 || r.status === 403) {
+    showToast('⚠️ 401: service_role 키를 사용하거나 RLS 정책을 추가하세요.', 4000);
+    return [];
+  }
+  var data = await r.json();
+  return Array.isArray(data) ? data : [];
+}
+
+async function sbUpsert(t, d) {
+  var r = await fetch(SUPA_URL+'/rest/v1/'+t, {
+    method: 'POST',
+    headers: Object.assign({}, sbH(), {'Prefer':'resolution=merge-duplicates'}),
+    body: JSON.stringify(d)
+  });
+  return r.status < 300;
+}
+
+// ════════════════════════════════════════
+// 키 관리
+// ════════════════════════════════════════
+function saveKey() {
+  var v = document.getElementById('keyInput').value.trim();
+  if (!v.startsWith('eyJ')) { document.getElementById('keyStatus').textContent = '❌ 유효하지 않은 키'; return; }
+  localStorage.setItem('sb_anon_key', v);
+  ANON_KEY = v;
+  document.getElementById('keyStatus').textContent = '✓ 저장됨';
+  document.getElementById('keyInput').value = '';
+}
+
+function checkKey() {
+  var k = localStorage.getItem('sb_anon_key');
+  if (k) { ANON_KEY = k; document.getElementById('keyStatus').textContent = '✓ 로드됨'; }
+}
+
+// ════════════════════════════════════════
+// 서브탭 전환
+// ════════════════════════════════════════
+var SUB_TABS = ['proxy','selcare','phone'];
+
+function switchSubTab(tab) {
+  SUB_TABS.forEach(function(t) {
+    var T = t.charAt(0).toUpperCase() + t.slice(1);
+    document.getElementById('tab'+T).classList.toggle('hidden', tab !== t);
+    document.getElementById('subTab'+T).classList.toggle('active', tab === t);
+  });
+}
+
+// ════════════════════════════════════════
+// ══ 대리처방 탭 ══
+// ════════════════════════════════════════
+var _proxyAllRows = [];
+var _proxySortCol = 'created_at';
+var _proxySortDir = -1; // 최신순
+
+async function loadSpecialList(type) {
+  if (!hasKey()) return;
+  var statusId = type==='proxy' ? 'proxyStatus' : 'selcareStatus';
+  var countId  = type==='proxy' ? 'proxyCount'  : 'selcareCount';
+  setStatus(statusId, 'loading', '조회 중...');
+
+  try {
+    if (type === 'proxy') {
+      var rows = await sbGet('daeri', {
+        select: 'chart,visitor_name,visitor_phone,relation,patient_name,created_at',
+        order: 'created_at.desc',
+        limit: '500'
+      });
+      _proxyAllRows = rows;
+      document.getElementById(countId).textContent = rows.length + '명';
+      renderProxyTable();
+      setStatus(statusId, 'success', '조회 완료 — ' + rows.length + '건');
+
+    } else {
+      // 선택의료
+      var rows = await sbGet('visits', {
+        selective_care: 'eq.Y',
+        select: 'chart_no,visit_date,next_visit_date,proxy_rx',
+        order: 'next_visit_date.desc',
+        limit: '500'
+      });
+      var chartNos = rows.map(function(r){ return r.chart_no; });
+      var patients = chartNos.length > 0
+        ? await sbGet('patients', { chart_no:'in.('+chartNos.join(',')+')', select:'chart_no,phone' })
+        : [];
+      var pMap = {};
+      patients.forEach(function(p){ pMap[p.chart_no] = p.phone||''; });
+      document.getElementById(countId).textContent = rows.length + '명';
+      var tbody = document.getElementById('selcareBody');
+      tbody.innerHTML = '';
+      rows.forEach(function(r) {
+        var selDate = r.proxy_rx || '';
+        var selDateDisp = selDate
+          ? '<span style="color:#065f46;font-weight:600;">'+selDate+'</span>'
+          : '<span style="color:var(--danger);font-weight:600;">미수령</span>';
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td><span class="chart-tag">'+r.chart_no+'</span></td>'
+          + '<td style="font-size:12px;">'+displayDate(fmt6(r.visit_date))+'</td>'
+          + '<td style="font-size:12px;">'+(r.next_visit_date?displayDate(fmt6(r.next_visit_date)):'-')+'</td>'
+          + '<td style="font-family:monospace;font-size:12px;">'+(pMap[r.chart_no]||'-')+'</td>'
+          + '<td style="font-size:12px;">'+selDateDisp+'</td>';
+        tbody.appendChild(tr);
+      });
+      setStatus(statusId, 'success', '조회 완료 — ' + rows.length + '건');
+    }
+  } catch(err) {
+    setStatus(statusId, 'error', '실패: '+err.message);
+  }
+}
+
+function renderProxyTable() {
+  var sc = (document.getElementById('proxySearchChart')||{}).value||'';
+  var sn = (document.getElementById('proxySearchName')||{}).value||'';
+  var sy = (document.getElementById('proxySearchYear')||{}).value||'';
+  sc = sc.trim().toLowerCase();
+  sn = sn.trim().toLowerCase();
+  sy = sy.trim();
+
+  var filtered = _proxyAllRows.filter(function(r) {
+    var d6 = caToD6(r.created_at);
+    if (sc && !(r.chart||'').toLowerCase().includes(sc)) return false;
+    if (sn && !((r.patient_name||'')+(r.visitor_name||'')).toLowerCase().includes(sn)) return false;
+    if (sy && !d6.startsWith(sy)) return false;
+    return true;
+  });
+
+  var col = _proxySortCol, dir = _proxySortDir;
+  filtered.sort(function(a, b) {
+    var av = col==='created_at' ? (a.created_at||'') : (a[col]||'');
+    var bv = col==='created_at' ? (b.created_at||'') : (b[col]||'');
+    if (av < bv) return -dir;
+    if (av > bv) return dir;
+    return 0;
+  });
+
+  // 헤더 화살표
+  ['chart','visitor_name','relation','patient_name','visitor_phone','created_at'].forEach(function(c) {
+    var el = document.getElementById('sort_'+c);
+    if (el) el.textContent = c===col ? (dir===1?'↑':'↓') : '↕';
+  });
+
+  var tbody = document.getElementById('proxyBody');
+  tbody.innerHTML = '';
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#aaa;">결과 없음</td></tr>';
+    return;
+  }
+  filtered.forEach(function(r) {
+    var d6 = caToD6(r.created_at);
+    var chart = r.chart || '-';
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><span class="chart-tag">'+chart+'</span></td>'
+      + '<td style="font-size:13px;white-space:nowrap;">'+(r.visitor_name||'-')+'</td>'
+      + '<td style="font-size:11px;color:#555;max-width:110px;">'+(r.relation||'-')+'</td>'
+      + '<td style="font-size:13px;white-space:nowrap;">'+(r.patient_name||'-')+'</td>'
+      + '<td style="font-family:monospace;font-size:12px;white-space:nowrap;">'+(r.visitor_phone||'-')+'</td>'
+      + '<td style="font-size:12px;white-space:nowrap;">'+d6+'</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function filterProxyTable() { renderProxyTable(); }
+
+function sortProxyTable(col) {
+  if (_proxySortCol === col) _proxySortDir *= -1;
+  else { _proxySortCol = col; _proxySortDir = 1; }
+  renderProxyTable();
+}
+
+function clearProxySearch() {
+  document.getElementById('proxySearchChart').value = '';
+  document.getElementById('proxySearchName').value = '';
+  document.getElementById('proxySearchYear').value = '';
+  filterProxyTable();
+}
+
+// ════════════════════════════════════════
+// ══ 전화번호 탭 ══
+// ════════════════════════════════════════
+var _nullPhoneList = [];
+
+async function loadNullPhoneList() {
+  if (!hasKey()) return;
+  var bodyEl  = document.getElementById('nullPhoneBody');
+  var countEl = document.getElementById('nullPhoneCount');
+  bodyEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px;"><div class="spinner" style="margin:0 auto 8px;"></div>조회 중...</div>';
+  countEl.textContent = '';
+  try {
+    var r1 = await fetch(SUPA_URL+'/rest/v1/patients?phone=is.null&select=chart_no,phone,sms_yn,updated_at&order=chart_no.asc&limit=500', {headers:sbH()});
+    var r2 = await fetch(SUPA_URL+'/rest/v1/patients?phone=eq.&select=chart_no,phone,sms_yn,updated_at&order=chart_no.asc&limit=500', {headers:sbH()});
+    var d1 = await r1.json();
+    var d2 = await r2.json();
+    _nullPhoneList = [].concat(Array.isArray(d1)?d1:[], Array.isArray(d2)?d2:[]);
+    var seen = {};
+    _nullPhoneList = _nullPhoneList.filter(function(p){ if(seen[p.chart_no]) return false; seen[p.chart_no]=true; return true; });
+    renderNullPhoneTable();
+  } catch(e) {
+    bodyEl.innerHTML = '<div style="text-align:center;padding:16px;color:var(--danger);font-size:13px;">❌ 조회 오류: '+e.message+'</div>';
+  }
+}
+
+function renderNullPhoneTable() {
+  var bodyEl  = document.getElementById('nullPhoneBody');
+  var countEl = document.getElementById('nullPhoneCount');
+  countEl.textContent = _nullPhoneList.length + '명';
+  if (!_nullPhoneList.length) {
+    bodyEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--success);font-size:13px;">✅ 미등록 환자 없음</div>';
+    return;
+  }
+  var rows = _nullPhoneList.map(function(p, idx) {
+    return '<tr>'
+      + '<td><span class="code-badge">'+p.chart_no+'</span></td>'
+      + '<td><span style="font-size:11px;color:var(--text2);">'+(p.updated_at?p.updated_at.slice(0,10):'-')+'</span></td>'
+      + '<td>'
+        + '<div style="display:flex;gap:5px;align-items:center;">'
+          + '<input type="tel" id="np-input-'+idx+'" placeholder="01012345678" inputmode="numeric"'
+            + ' style="background:#f7f8fc;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;width:130px;outline:none;"'
+            + ' onkeydown="if(event.key===\'Enter\')saveNullPhone('+idx+',\''+p.chart_no+'\')">'
+          + '<button onclick="saveNullPhone('+idx+',\''+p.chart_no+'\')" class="btn btn-success" style="font-size:11px;padding:5px 10px;">저장</button>'
+          + '<button onclick="jumpToChange(\''+p.chart_no+'\')" class="btn btn-outline" style="font-size:11px;padding:5px 8px;" title="변경 폼으로">✏️</button>'
+        + '</div>'
+        + '<div id="np-msg-'+idx+'" style="font-size:11px;min-height:14px;margin-top:3px;font-weight:600;"></div>'
+      + '</td>'
+      + '</tr>';
+  }).join('');
+  bodyEl.innerHTML = '<div style="overflow-x:auto;"><table><thead><tr><th>챠트번호</th><th>최근수정</th><th>전화번호 입력</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+
+function jumpToChange(chartNo) {
+  document.getElementById('pc2-chart').value = chartNo;
+  pc2Search();
+}
+
+async function saveNullPhone(idx, chartNo) {
+  var inputEl = document.getElementById('np-input-'+idx);
+  var msgEl   = document.getElementById('np-msg-'+idx);
+  var phone   = (inputEl.value||'').trim();
+  if (!phone) { msgEl.textContent='⚠️ 번호 입력 필요'; msgEl.style.color='var(--danger)'; return; }
+  msgEl.textContent='저장 중...'; msgEl.style.color='var(--text2)';
+  try {
+    var ok = await sbUpsert('patients', {chart_no:chartNo, phone:phone, updated_at:new Date().toISOString()});
+    if (ok) {
+      msgEl.textContent='✅ 저장됨'; msgEl.style.color='var(--success)';
+      _nullPhoneList.splice(idx, 1);
+      showToast('✅ '+chartNo+' → '+phone+' 저장 완료');
+      setTimeout(renderNullPhoneTable, 700);
+    } else {
+      msgEl.textContent='❌ 저장 실패'; msgEl.style.color='var(--danger)';
+    }
+  } catch(e) {
+    msgEl.textContent='❌ 오류'; msgEl.style.color='var(--danger)';
+  }
+}
+
+function downloadNullPhoneCsv() {
+  if (!_nullPhoneList.length) { showToast('먼저 조회해주세요.'); return; }
+  var csv = '챠트번호,최근수정\n';
+  _nullPhoneList.forEach(function(p) {
+    csv += p.chart_no + ',' + (p.updated_at||'').slice(0,10) + '\n';
+  });
+  var blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '전화번호미등록_'+today6()+'.csv';
+  a.click();
+}
+
+function pc2FmtPhone(ph) {
+  if (!ph) return '(미등록)';
+  var d = ph.replace(/[^0-9]/g,'');
+  if (d.length===11) return d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3');
+  if (d.length===10) return d.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3');
+  return ph;
+}
+
+async function pc2Search() {
+  if (!hasKey()) return;
+  var chart = document.getElementById('pc2-chart').value.trim();
+  var msgEl = document.getElementById('pc2-search-msg');
+  if (!chart) { msgEl.textContent='⚠️ 차트번호를 입력하세요.'; msgEl.style.color='var(--danger)'; return; }
+  msgEl.textContent='조회 중...'; msgEl.style.color='var(--text2)';
+  try {
+    var rows = await sbGet('patients', {chart_no:'eq.'+chart, select:'chart_no,phone'});
+    if (!rows.length) {
+      msgEl.textContent='⚠️ 차트번호 "'+chart+'"를 찾을 수 없습니다.'; msgEl.style.color='var(--danger)'; return;
+    }
+    var p = rows[0];
+    document.getElementById('pc2-display-chart').textContent = p.chart_no;
+    document.getElementById('pc2-current-phone').textContent = pc2FmtPhone(p.phone);
+    document.getElementById('pc2-phone-new').value = '';
+    document.getElementById('pc2-phone-result').textContent = '';
+    msgEl.textContent = '';
+    document.getElementById('pc2-step1').classList.add('hidden');
+    document.getElementById('pc2-step2').classList.remove('hidden');
+    setTimeout(function(){ document.getElementById('pc2-phone-new').focus(); }, 100);
+  } catch(e) {
+    msgEl.textContent='⚠️ 조회 중 오류가 발생했습니다.'; msgEl.style.color='var(--danger)';
+  }
+}
+
+async function pc2SearchByPhone() {
+  if (!hasKey()) return;
+  var phoneRaw = document.getElementById('pc2-phone-search').value.trim();
+  var msgEl    = document.getElementById('pc2-phone-search-msg');
+  var resultEl = document.getElementById('pc2-phone-search-result');
+  var listEl   = document.getElementById('pc2-phone-search-list');
+  if (!phoneRaw) { msgEl.textContent='⚠️ 전화번호를 입력하세요.'; msgEl.style.color='var(--danger)'; return; }
+  var phone = phoneRaw.replace(/-/g,'');
+  msgEl.textContent='조회 중...'; msgEl.style.color='var(--text2)';
+  resultEl.classList.add('hidden');
+  try {
+    var r = await fetch(SUPA_URL+'/rest/v1/patients?phone=like.*'+encodeURIComponent(phone)+'*&select=chart_no,phone&order=chart_no.asc&limit=20', {headers:sbH()});
+    var data = await r.json();
+    if (!Array.isArray(data) || !data.length) {
+      msgEl.textContent='❌ 일치하는 차트번호가 없습니다.'; msgEl.style.color='var(--danger)'; return;
+    }
+    msgEl.textContent='✅ '+data.length+'건 조회됨'; msgEl.style.color='var(--success)';
+    listEl.innerHTML = data.map(function(p) {
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #e6f7f1;">'
+        + '<div><span class="code-badge">'+p.chart_no+'</span>'
+        + '<span style="font-size:13px;color:var(--text);margin-left:8px;">'+(p.phone||'번호없음')+'</span></div>'
+        + '<button onclick="document.getElementById(\'pc2-chart\').value=\''+p.chart_no+'\';pc2Search();" class="btn btn-primary" style="font-size:11px;padding:4px 10px;">선택</button>'
+        + '</div>';
+    }).join('');
+    resultEl.classList.remove('hidden');
+  } catch(e) {
+    msgEl.textContent='❌ 오류: '+e.message; msgEl.style.color='var(--danger)';
+  }
+}
+
+async function pc2ChangePhone() {
+  var chart = document.getElementById('pc2-chart').value.trim();
+  var phone = document.getElementById('pc2-phone-new').value.trim();
+  var resEl = document.getElementById('pc2-phone-result');
+  if (!phone) { resEl.textContent='⚠️ 새 전화번호를 입력하세요.'; resEl.style.color='var(--danger)'; return; }
+  resEl.textContent='처리 중...'; resEl.style.color='var(--text2)';
+  try {
+    var ok = await sbUpsert('patients', {chart_no:chart, phone:phone, updated_at:new Date().toISOString()});
+    if (ok) {
+      resEl.textContent='✅ 변경 완료 → '+phone; resEl.style.color='var(--success)';
+      showToast('✅ 전화번호 변경 완료: '+phone);
+      setTimeout(pc2Reset, 1800);
+    } else {
+      resEl.textContent='⚠️ 변경 실패. 다시 시도해주세요.'; resEl.style.color='var(--danger)';
+    }
+  } catch(e) {
+    resEl.textContent='⚠️ 오류가 발생했습니다.'; resEl.style.color='var(--danger)';
+  }
+}
+
+function pc2Reset() {
+  document.getElementById('pc2-step1').classList.remove('hidden');
+  document.getElementById('pc2-step2').classList.add('hidden');
+  document.getElementById('pc2-chart').value = '';
+  document.getElementById('pc2-phone-new').value = '';
+  document.getElementById('pc2-phone-search').value = '';
+  document.getElementById('pc2-search-msg').textContent = '';
+  document.getElementById('pc2-phone-search-msg').textContent = '';
+  document.getElementById('pc2-phone-result').textContent = '';
+  document.getElementById('pc2-phone-search-result').classList.add('hidden');
+  setTimeout(function(){ document.getElementById('pc2-chart').focus(); }, 100);
+}
+
+// ════════════════════════════════════════
+// 초기화
+// ════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', function() {
+  checkKey();
+  // 첫 탭(대리처방) 자동 로드
+  if (ANON_KEY) loadSpecialList('proxy');
+});
+</script>
+</body>
+</html>

@@ -290,9 +290,10 @@ tr:hover td { background: #fafbff; }
 <!-- ══ Supabase Key ══ -->
 <div id="keyBanner">
   <span style="font-size:11px;color:var(--text2);">🔑 Supabase Key</span>
-  <input type="password" id="keyInput" placeholder="eyJhbGci...">
+  <input type="password" id="keyInput" placeholder="eyJhbGci... (service_role 또는 anon)">
   <button onclick="saveKey()" class="btn btn-primary" style="font-size:11px;padding:5px 10px;">저장</button>
   <span id="keyStatus" style="font-size:11px;color:var(--text2);"></span>
+  <span id="keyRlsHint" style="font-size:11px;color:var(--danger);display:none;">⚠️ 401 오류 시 service_role 키를 사용하거나 Supabase에서 RLS policy를 추가하세요</span>
 </div>
 
 <!-- ══ 메인 탭 네비 ══ -->
@@ -643,6 +644,11 @@ function hasKey() {
 async function sbGet(t, p) {
   var qs = Object.entries(p).map(function(e){ return e[0]+'='+encodeURIComponent(e[1]); }).join('&');
   var r = await fetch(SUPA_URL+'/rest/v1/'+t+'?'+qs, { headers: sbH() });
+  if (r.status === 401 || r.status === 403) {
+    document.getElementById('keyRlsHint').style.display = '';
+    return [];
+  }
+  document.getElementById('keyRlsHint').style.display = 'none';
   var data = await r.json();
   return Array.isArray(data) ? data : [];
 }
