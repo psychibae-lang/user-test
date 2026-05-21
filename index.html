@@ -296,7 +296,7 @@ tr:hover td { background: #fafbff; }
 <!-- ══ 메인 탭 네비 ══ -->
 <nav class="main-nav">
   <button class="main-tab active" id="mainTabClinic" onclick="switchMainTab('clinic')">🏥 진료관련</button>
-  <!-- 추후 탭 추가 예정 -->
+  <button class="main-tab" id="mainTabLookup" onclick="switchMainTab('lookup')">🔎 조회</button>
 </nav>
 
 <!-- ══ 서브탭 (진료관련) ══ -->
@@ -487,6 +487,14 @@ tr:hover td { background: #fafbff; }
     </div>
     <div id="search-results" style="font-size:13px;color:#9ca3af;text-align:center;padding:20px;">조회 버튼을 눌러주세요.</div>
   </div>
+</div>
+
+<!-- ══ 조회 메인탭 패널 (search.html iframe) ══ -->
+<div id="panelLookup" class="hidden" style="width:100%;height:calc(100vh - 95px);">
+  <iframe id="lookupFrame" src="search.html"
+    style="width:100%;height:100%;border:none;display:block;"
+    allow="same-origin">
+  </iframe>
 </div>
 
 <!-- ══ 접수조회 상세 모달 ══ -->
@@ -710,6 +718,25 @@ var SUB_TABS = ['patient','appt','search'];
 function switchMainTab(tab) {
   document.querySelectorAll('.main-tab').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById('mainTab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
+
+  var isClinic = (tab === 'clinic');
+  // 서브탭 네비 및 서브탭 패널 표시/숨김
+  document.getElementById('subNavClinic').classList.toggle('hidden', !isClinic);
+  SUB_TABS.forEach(function(t) {
+    var panel = document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if (panel) panel.classList.toggle('hidden', !isClinic);
+  });
+
+  // 조회 iframe 패널
+  var lookupPanel = document.getElementById('panelLookup');
+  lookupPanel.classList.toggle('hidden', isClinic);
+
+  // 진료관련으로 돌아올 때 현재 서브탭 복원
+  if (isClinic) {
+    var activeSub = document.querySelector('.sub-tab.active');
+    var subId = activeSub ? activeSub.id.replace('subTab','').toLowerCase() : 'patient';
+    switchSubTab(subId);
+  }
 }
 
 function switchSubTab(tab) {
